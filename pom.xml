@@ -11,7 +11,7 @@
     <packaging>jar</packaging>   
     <version>1.0.0-SNAPSHOT</version>
     <name>${project.groupId}:${project.artifactId}</name>
-    <description>Service provider for JsonService SPI, based on Jackson-stack</description>
+    <description>Service provider for JsonCodec SPI, based on Jackson-stack</description>
     <url>https://github.com/brutusin/jackson-service-provider</url>
     
     <issueManagement>

@@ -28,7 +28,7 @@ import com.fasterxml.jackson.module.jsonSchema.types.StringSchema;
 import java.lang.reflect.Method;
 import java.util.List;
 import org.brutusin.commons.json.annotations.JsonProperty;
-import org.brutusin.commons.json.spi.JsonService;
+import org.brutusin.commons.json.spi.JsonCodec;
 
 /**
  *
@@ -52,7 +52,7 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
             String def = annot.defaultJsonExp();
             if (def != null) {
                 try {
-                    Object defaultValue = JsonService.getInstance().parse(def, beanProperty.getType().getRawClass());
+                    Object defaultValue = JsonCodec.getInstance().parse(def, beanProperty.getType().getRawClass());
                     Method method = schema.getClass().getMethod("setDef", Object.class);
                     method.invoke(schema, defaultValue);
                 } catch (Exception parseException) {
@@ -62,7 +62,7 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
             String values = annot.values();
             if (values != null) {
                 try {
-                    Object valuesValue = JsonService.getInstance().parse(values, List.class);
+                    Object valuesValue = JsonCodec.getInstance().parse(values, List.class);
                     Method method = schema.getClass().getMethod("setValues", List.class);
                     method.invoke(schema, valuesValue);
                 } catch (Exception parseException) {

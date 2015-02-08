@@ -28,21 +28,21 @@ import java.io.IOException;
 import org.brutusin.commons.json.spi.JsonNode;
 import org.brutusin.commons.json.spi.JsonSchema;
 import org.brutusin.commons.json.ParseException;
-import org.brutusin.commons.json.spi.JsonService;
+import org.brutusin.commons.json.spi.JsonCodec;
 
 /**
  * @author Ignacio del Valle Alles idelvall@brutusin.org
  */
-public class JacksonServiceProvider extends JsonService {
+public class JacksonCodec extends JsonCodec {
 
     private final ObjectMapper mapper;
     private final SchemaFactoryWrapper schemaFactory;
 
-    public JacksonServiceProvider() {
+    public JacksonCodec() {
         this(null, null);
     }
 
-    public JacksonServiceProvider(ObjectMapper mapper, SchemaFactoryWrapper schemaFactory) {
+    public JacksonCodec(ObjectMapper mapper, SchemaFactoryWrapper schemaFactory) {
         if (mapper == null) {
             mapper = new ObjectMapper();
             mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
