@@ -1,0 +1,2 @@
+#org.brutusin:jackson-service-provider [![Build Status](https://api.travis-ci.org/brutusin/jackson-service-provider.svg?branch=master)](https://travis-ci.org/brutusin/jackson-service-provider) [![Maven Central Latest Version](https://maven-badges.herokuapp.com/maven-central/org.brutusin/jackson-service-provider/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.brutusin/jackson-service-provider/)
+Service provider for JsonService SPI, based on Jackson-stack.
