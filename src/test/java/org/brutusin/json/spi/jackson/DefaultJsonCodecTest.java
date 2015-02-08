@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.brutusin.json.codec.impl.def;
+package org.brutusin.json.spi.jackson;
 
 import org.brutusin.json.spi.jackson.JacksonServiceProvider;
 import org.brutusin.commons.json.annotations.JsonProperty;
