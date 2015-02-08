@@ -7,3 +7,15 @@ Service provider for [JsonCodec SPI](https://github.com/brutusin/commons/tree/ma
 
 
 See [ServiceLoader](http://docs.oracle.com/javase/6/docs/api/java/util/ServiceLoader.html) for more details.
+
+## Support, bugs and requests
+https://github.com/brutusin/jsonsrv/issues
+
+## Authors
+
+- Ignacio del Valle Alles (<https://github.com/idelvall/>)
+
+Contributions are always welcome and greatly appreciated!
+
+##License
+Apache License, Version 2.0
