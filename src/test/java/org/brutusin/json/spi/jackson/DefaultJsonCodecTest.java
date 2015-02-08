@@ -15,7 +15,6 @@
  */
 package org.brutusin.json.spi.jackson;
 
-import org.brutusin.json.spi.jackson.JacksonCodec;
 import org.brutusin.commons.json.annotations.JsonProperty;
 import org.brutusin.commons.json.spi.JsonCodec;
 import org.junit.Test;
@@ -33,7 +32,6 @@ public class DefaultJsonCodecTest {
     public void testTransform() {
         System.out.println(JsonCodec.getInstance().getSchema(TestClass.class));
     }
-
 }
 
 class TestClass {
