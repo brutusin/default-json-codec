@@ -9,7 +9,7 @@ Service provider for [JsonCodec SPI](https://github.com/brutusin/commons/tree/ma
 See [ServiceLoader](http://docs.oracle.com/javase/6/docs/api/java/util/ServiceLoader.html) for more details.
 
 ## Support, bugs and requests
-https://github.com/brutusin/jsonsrv/issues
+https://github.com/brutusin/json-codec-jackson/issues
 
 ## Authors
 
