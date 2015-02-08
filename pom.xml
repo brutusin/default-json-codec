@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.brutusin</groupId>
         <artifactId>brutusin</artifactId>
-        <version>1.0.3-SNAPSHOT</version>
+        <version>1.0.3</version>
     </parent>
     <groupId>org.brutusin</groupId>
     <artifactId>json-codec-jackson</artifactId>
@@ -39,7 +39,7 @@
         <dependency>
             <groupId>org.brutusin</groupId>
             <artifactId>commons</artifactId>
-            <version>1.2.3-SNAPSHOT</version>
+            <version>1.2.3</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
