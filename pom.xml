@@ -30,6 +30,9 @@
         <developerConnection>scm:git:https://github.com/brutusin/json-codec-jackson.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
+    <properties>
+        <commons.version>1.2.4-SNAPSHOT</commons.version>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -39,7 +42,14 @@
         <dependency>
             <groupId>org.brutusin</groupId>
             <artifactId>commons</artifactId>
-            <version>1.2.3</version>
+            <type>test-jar</type>
+            <version>${commons.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.brutusin</groupId>
+            <artifactId>commons</artifactId>
+            <version>${commons.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>

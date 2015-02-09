@@ -111,7 +111,7 @@ public class JacksonCodec extends JsonCodec {
         try {
             mapper.acceptJsonFormatVisitor(mapper.constructType(clazz), schemaFactory);
             com.fasterxml.jackson.module.jsonSchema.JsonSchema finalSchema = schemaFactory.finalSchema();
-            return mapper.writeValueAsString(finalSchema);
+            return addDraftv3(mapper.writeValueAsString(finalSchema));
         } catch (JsonProcessingException ex) {
             throw new RuntimeException(ex);
         }
@@ -119,5 +119,16 @@ public class JacksonCodec extends JsonCodec {
 
     public String quoteAsUTF8(String s) {
         return new String(JsonStringEncoder.getInstance().quoteAsUTF8(s));
+    }
+
+    private static String addDraftv3(String jsonSchema) {
+        if (!jsonSchema.contains("\"$schema\"")) {
+            if (jsonSchema.startsWith("{\"type\":")) {
+                StringBuilder sb = new StringBuilder(jsonSchema);
+                sb.insert(1, "\"$schema\":\"http://json-schema.org/draft-03/schema#\",");
+                return sb.toString();
+            }
+        }
+        return jsonSchema;
     }
 }

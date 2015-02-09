@@ -27,6 +27,7 @@ import com.fasterxml.jackson.module.jsonSchema.types.SimpleTypeSchema;
 import com.fasterxml.jackson.module.jsonSchema.types.StringSchema;
 import java.lang.reflect.Method;
 import java.util.List;
+import org.brutusin.commons.json.annotations.IndexableProperty;
 import org.brutusin.commons.json.annotations.JsonProperty;
 import org.brutusin.commons.json.spi.JsonCodec;
 
@@ -37,19 +38,20 @@ import org.brutusin.commons.json.spi.JsonCodec;
 public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchema.factories.JsonSchemaFactory {
 
     void enrich(SimpleTypeSchema schema, BeanProperty beanProperty) {
-        JsonProperty annot = beanProperty.getAnnotation(JsonProperty.class);
+        JsonProperty jsonAnnot = beanProperty.getAnnotation(JsonProperty.class);
+        IndexableProperty indexAnnot = beanProperty.getAnnotation(IndexableProperty.class);
 
-        if (annot == null) {
+        if (jsonAnnot == null) {
             schema.setTitle(beanProperty.getName());
         } else {
-            if (annot.title() != null) {
-                schema.setTitle(annot.title());
+            if (jsonAnnot.title() != null) {
+                schema.setTitle(jsonAnnot.title());
             } else {
                 schema.setTitle(beanProperty.getName());
             }
-            schema.setDescription(annot.description());
-            schema.setRequired(annot.required());
-            String def = annot.defaultJsonExp();
+            schema.setDescription(jsonAnnot.description());
+            schema.setRequired(jsonAnnot.required());
+            String def = jsonAnnot.defaultJsonExp();
             if (def != null) {
                 try {
                     Object defaultValue = JsonCodec.getInstance().parse(def, beanProperty.getType().getRawClass());
@@ -59,7 +61,7 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
                     throw new Error("Error setting default value for " + beanProperty.getFullName(), parseException);
                 }
             }
-            String values = annot.values();
+            String values = jsonAnnot.values();
             if (values != null) {
                 try {
                     Object valuesValue = JsonCodec.getInstance().parse(values, List.class);
@@ -68,6 +70,14 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
                 } catch (Exception parseException) {
                     throw new Error("Error setting enum value for " + beanProperty.getFullName(), parseException);
                 }
+            }
+        }
+        if (indexAnnot != null) {
+            try {
+                Method method = schema.getClass().getMethod("setIndex", IndexableProperty.IndexMode.class);
+                method.invoke(schema, indexAnnot.mode());
+            } catch (Exception parseException) {
+                throw new Error("Error setting enum value for " + beanProperty.getFullName(), parseException);
             }
         }
     }
@@ -79,6 +89,8 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
             private Object def;
             @com.fasterxml.jackson.annotation.JsonProperty("enum")
             private List values;
+            @com.fasterxml.jackson.annotation.JsonProperty
+            private IndexableProperty.IndexMode index;
 
             public Object getDef() {
                 return def;
@@ -94,6 +106,14 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
 
             public void setValues(List values) {
                 this.values = values;
+            }
+
+            public IndexableProperty.IndexMode getIndex() {
+                return index;
+            }
+
+            public void setIndex(IndexableProperty.IndexMode index) {
+                this.index = index;
             }
 
             @Override
@@ -110,6 +130,8 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
             private Object def;
             @com.fasterxml.jackson.annotation.JsonProperty("enum")
             private List values;
+            @com.fasterxml.jackson.annotation.JsonProperty
+            private IndexableProperty.IndexMode index;
 
             public Object getDef() {
                 return def;
@@ -125,6 +147,14 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
 
             public void setValues(List values) {
                 this.values = values;
+            }
+
+            public IndexableProperty.IndexMode getIndex() {
+                return index;
+            }
+
+            public void setIndex(IndexableProperty.IndexMode index) {
+                this.index = index;
             }
 
             @Override
@@ -141,6 +171,8 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
             private Object def;
             @com.fasterxml.jackson.annotation.JsonProperty("enum")
             private List values;
+            @com.fasterxml.jackson.annotation.JsonProperty
+            private IndexableProperty.IndexMode index;
 
             public Object getDef() {
                 return def;
@@ -156,6 +188,14 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
 
             public void setValues(List values) {
                 this.values = values;
+            }
+
+            public IndexableProperty.IndexMode getIndex() {
+                return index;
+            }
+
+            public void setIndex(IndexableProperty.IndexMode index) {
+                this.index = index;
             }
 
             @Override
@@ -172,6 +212,8 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
             private Object def;
             @com.fasterxml.jackson.annotation.JsonProperty("enum")
             private List values;
+            @com.fasterxml.jackson.annotation.JsonProperty
+            private IndexableProperty.IndexMode index;
 
             public Object getDef() {
                 return def;
@@ -187,6 +229,14 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
 
             public void setValues(List values) {
                 this.values = values;
+            }
+
+            public IndexableProperty.IndexMode getIndex() {
+                return index;
+            }
+
+            public void setIndex(IndexableProperty.IndexMode index) {
+                this.index = index;
             }
 
             @Override
@@ -203,6 +253,8 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
             private Object def;
             @com.fasterxml.jackson.annotation.JsonProperty("enum")
             private List values;
+            @com.fasterxml.jackson.annotation.JsonProperty
+            private IndexableProperty.IndexMode index;
 
             public Object getDef() {
                 return def;
@@ -218,6 +270,14 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
 
             public void setValues(List values) {
                 this.values = values;
+            }
+
+            public IndexableProperty.IndexMode getIndex() {
+                return index;
+            }
+
+            public void setIndex(IndexableProperty.IndexMode index) {
+                this.index = index;
             }
 
             @Override
@@ -234,6 +294,8 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
             private Object def;
             @com.fasterxml.jackson.annotation.JsonProperty("enum")
             private List values;
+            @com.fasterxml.jackson.annotation.JsonProperty
+            private IndexableProperty.IndexMode index;
 
             public Object getDef() {
                 return def;
@@ -249,6 +311,14 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
 
             public void setValues(List values) {
                 this.values = values;
+            }
+
+            public IndexableProperty.IndexMode getIndex() {
+                return index;
+            }
+
+            public void setIndex(IndexableProperty.IndexMode index) {
+                this.index = index;
             }
 
             @Override
@@ -265,6 +335,8 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
             private Object def;
             @com.fasterxml.jackson.annotation.JsonProperty("enum")
             private List values;
+            @com.fasterxml.jackson.annotation.JsonProperty
+            private IndexableProperty.IndexMode index;
 
             public Object getDef() {
                 return def;
@@ -280,6 +352,14 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
 
             public void setValues(List values) {
                 this.values = values;
+            }
+
+            public IndexableProperty.IndexMode getIndex() {
+                return index;
+            }
+
+            public void setIndex(IndexableProperty.IndexMode index) {
+                this.index = index;
             }
 
             @Override
@@ -296,6 +376,8 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
             private Object def;
             @com.fasterxml.jackson.annotation.JsonProperty("enum")
             private List values;
+            @com.fasterxml.jackson.annotation.JsonProperty
+            private IndexableProperty.IndexMode index;
 
             public Object getDef() {
                 return def;
@@ -311,6 +393,14 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
 
             public void setValues(List values) {
                 this.values = values;
+            }
+
+            public IndexableProperty.IndexMode getIndex() {
+                return index;
+            }
+
+            public void setIndex(IndexableProperty.IndexMode index) {
+                this.index = index;
             }
 
             @Override

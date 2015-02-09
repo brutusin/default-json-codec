@@ -50,7 +50,9 @@ public class JacksonSchema implements JsonSchema {
         try {
             report = impl.validate(nodeImpl.getNode());
         } catch (ProcessingException ex) {
-            throw new RuntimeException(ex);
+            List<String> messages = new ArrayList();
+            messages.add(ex.getProcessingMessage().getMessage());
+            throw new ValidationException(messages);
         }
         if (!report.isSuccess()) {
             Iterator<ProcessingMessage> iterator = report.iterator();
