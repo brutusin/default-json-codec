@@ -103,4 +103,9 @@ public class JacksonNode implements JsonNode {
     public com.fasterxml.jackson.databind.JsonNode getNode() {
         return node;
     }
+
+    @Override
+    public String toString() {
+        return node.toString();
+    }
 }

@@ -15,9 +15,11 @@
  */
 package org.brutusin.json.spi.jackson;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.module.jsonSchema.factories.FormatVisitorFactory;
 import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
+import com.fasterxml.jackson.module.jsonSchema.factories.Visitor;
 import com.fasterxml.jackson.module.jsonSchema.factories.VisitorContext;
 import com.fasterxml.jackson.module.jsonSchema.factories.WrapperFactory;
 
@@ -50,5 +52,19 @@ public class JacksonFactoryWrapper extends SchemaFactoryWrapper {
         super(p);
         visitorFactory = new FormatVisitorFactory(wrapperFactory);
         schemaProvider = new JacksonSchemaFactory();
+        // Disable using references:
+        this.visitorContext = new VisitorContext(){
+            @Override
+            public String getSeenSchemaUri(JavaType aSeenSchema) {
+                return null;
+            }
+        };
     }
+
+    @Override
+    public Visitor setVisitorContext(VisitorContext rvc) {
+        return this;
+    }
+    
+    
 }
