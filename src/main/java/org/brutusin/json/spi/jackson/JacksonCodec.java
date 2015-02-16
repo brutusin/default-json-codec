@@ -54,6 +54,18 @@ public class JacksonCodec extends JsonCodec {
         this.schemaFactory = schemaFactory;
     }
 
+    private static String addDraftv3(String jsonSchema) {
+        if (!jsonSchema.contains("\"$schema\"")) {
+            if (jsonSchema.startsWith("{\"type\":")) {
+                StringBuilder sb = new StringBuilder(jsonSchema);
+                sb.insert(1, "\"$schema\":\"http://json-schema.org/draft-03/schema#\",");
+                return sb.toString();
+            }
+        }
+        return jsonSchema;
+    }
+
+    @Override
     public String transform(Object o) {
         try {
             return mapper.writeValueAsString(o);
@@ -62,24 +74,13 @@ public class JacksonCodec extends JsonCodec {
         }
     }
 
+    @Override
     public JsonNode parse(String json) throws ParseException {
         com.fasterxml.jackson.databind.JsonNode node = load(json);
         return new JacksonNode(node);
     }
 
-    private com.fasterxml.jackson.databind.JsonNode load(String json) throws ParseException {
-        if (json == null || json.trim().isEmpty()) {
-            return null;
-        }
-        try {
-            return mapper.readTree(json);
-        } catch (JsonProcessingException ex) {
-            throw new ParseException(ex);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
+    @Override
     public <T> T parse(String json, Class<T> clazz) throws ParseException {
         try {
             if (json == null || json.trim().isEmpty()) {
@@ -95,6 +96,7 @@ public class JacksonCodec extends JsonCodec {
         }
     }
 
+    @Override
     public JsonSchema parseSchema(String json) throws ParseException {
         com.fasterxml.jackson.databind.JsonNode node = load(json);
         try {
@@ -107,7 +109,8 @@ public class JacksonCodec extends JsonCodec {
         }
     }
 
-    public String getSchema(Class clazz) {
+    @Override
+    public String getSchemaString(Class clazz) {
         try {
             mapper.acceptJsonFormatVisitor(mapper.constructType(clazz), schemaFactory);
             com.fasterxml.jackson.module.jsonSchema.JsonSchema finalSchema = schemaFactory.finalSchema();
@@ -117,18 +120,21 @@ public class JacksonCodec extends JsonCodec {
         }
     }
 
+    @Override
     public String quoteAsUTF8(String s) {
         return new String(JsonStringEncoder.getInstance().quoteAsUTF8(s));
     }
 
-    private static String addDraftv3(String jsonSchema) {
-        if (!jsonSchema.contains("\"$schema\"")) {
-            if (jsonSchema.startsWith("{\"type\":")) {
-                StringBuilder sb = new StringBuilder(jsonSchema);
-                sb.insert(1, "\"$schema\":\"http://json-schema.org/draft-03/schema#\",");
-                return sb.toString();
-            }
+    private com.fasterxml.jackson.databind.JsonNode load(String json) throws ParseException {
+        if (json == null || json.trim().isEmpty()) {
+            return null;
         }
-        return jsonSchema;
+        try {
+            return mapper.readTree(json);
+        } catch (JsonProcessingException ex) {
+            throw new ParseException(ex);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }
