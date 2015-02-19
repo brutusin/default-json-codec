@@ -86,8 +86,12 @@ public class JacksonNode implements JsonNode {
     }
 
     @Override
-    public JsonNode get(int i) {
-        return new JacksonNode(node.get(i));
+    public JacksonNode get(int i) {
+        com.fasterxml.jackson.databind.JsonNode nodeImpl = node.get(i);
+        if (nodeImpl == null) {
+            return null;
+        }
+        return new JacksonNode(nodeImpl);
     }
 
     @Override
@@ -96,16 +100,33 @@ public class JacksonNode implements JsonNode {
     }
 
     @Override
-    public JsonNode get(String property) {
-        return new JacksonNode(node.get(property));
-    }
-
-    public com.fasterxml.jackson.databind.JsonNode getNode() {
-        return node;
+    public JacksonNode get(String property) {
+        com.fasterxml.jackson.databind.JsonNode nodeImpl = node.get(property);
+        if (nodeImpl == null) {
+            return null;
+        }
+        return new JacksonNode(nodeImpl);
     }
 
     @Override
     public String toString() {
-        return node.toString();
+        return this.node.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof JacksonNode)) {
+            return false;
+        }
+        return this.node.equals(((JacksonNode)obj).getNode());
+    }
+
+    @Override
+    public int hashCode() {
+        return this.node.hashCode();
+    }
+
+    public com.fasterxml.jackson.databind.JsonNode getNode() {
+        return node;
     }
 }

@@ -31,7 +31,7 @@
         <tag>HEAD</tag>
     </scm>
     <properties>
-        <commons.version>1.2.6</commons.version>
+        <commons.version>1.3.0</commons.version>
     </properties>
     <dependencies>
         <dependency>
@@ -92,20 +92,15 @@
                             <excludes>
                                 <exclude>org.brutusin:*</exclude>
                                 <exclude>*commons*</exclude>
-                                <exclude>java*</exclude>
                                 <exclude>junit:*</exclude>
                             </excludes>
                             <rules>
                                 <rule>
-                                    <pattern>com.fasterxml.**</pattern>
+                                    <pattern>com.**</pattern>
                                     <result>org.brutusin.@0</result>
                                 </rule>
                                 <rule>
-                                    <pattern>com.github.fge.**</pattern>
-                                    <result>org.brutusin.@0</result>
-                                </rule>
-                                <rule>
-                                    <pattern>com.google.**</pattern>
+                                    <pattern>javax.**</pattern>
                                     <result>org.brutusin.@0</result>
                                 </rule>
                                 <rule>

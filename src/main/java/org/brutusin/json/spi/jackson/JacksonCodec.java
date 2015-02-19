@@ -22,8 +22,6 @@ import com.fasterxml.jackson.core.io.JsonStringEncoder;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
-import com.github.fge.jsonschema.core.exceptions.ProcessingException;
-import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import java.io.IOException;
 import org.brutusin.commons.json.spi.JsonNode;
 import org.brutusin.commons.json.spi.JsonSchema;
@@ -54,7 +52,8 @@ public class JacksonCodec extends JsonCodec {
         this.schemaFactory = schemaFactory;
     }
 
-    private static String addDraftv3(String jsonSchema) {
+    public static String addDraftv3(String jsonSchema) {
+        jsonSchema = jsonSchema.replaceAll("\"\\$schema\"\\s*:\\s*\"http://json-schema.org/draft-03/schema#\"\\s*,?", "");
         if (!jsonSchema.contains("\"$schema\"")) {
             if (jsonSchema.startsWith("{\"type\":")) {
                 StringBuilder sb = new StringBuilder(jsonSchema);
@@ -98,15 +97,7 @@ public class JacksonCodec extends JsonCodec {
 
     @Override
     public JsonSchema parseSchema(String json) throws ParseException {
-        com.fasterxml.jackson.databind.JsonNode node = load(json);
-        try {
-            com.github.fge.jsonschema.main.JsonSchema jsonSchema = JsonSchemaFactory.byDefault().getJsonSchema(node);
-            JacksonSchema ret = new JacksonSchema();
-            ret.setImpl(jsonSchema);
-            return ret;
-        } catch (ProcessingException ex) {
-            throw new RuntimeException(ex);
-        }
+        return new JacksonSchema(json, mapper);
     }
 
     @Override
