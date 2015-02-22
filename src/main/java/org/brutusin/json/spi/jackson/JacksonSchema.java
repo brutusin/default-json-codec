@@ -29,6 +29,7 @@ import org.brutusin.commons.json.ParseException;
 import org.brutusin.commons.json.spi.JsonNode;
 import org.brutusin.commons.json.spi.JsonSchema;
 import org.brutusin.commons.json.ValidationException;
+import org.brutusin.commons.json.impl.LazyJsonNode;
 
 /**
  *
@@ -36,7 +37,7 @@ import org.brutusin.commons.json.ValidationException;
  */
 public class JacksonSchema extends JacksonNode implements JsonSchema {
 
-    private transient com.github.fge.jsonschema.main.JsonSchema validator;
+    private volatile com.github.fge.jsonschema.main.JsonSchema validator;
     private final ObjectMapper mapper;
 
     public JacksonSchema(String schema, ObjectMapper mapper) throws ParseException {
@@ -59,6 +60,10 @@ public class JacksonSchema extends JacksonNode implements JsonSchema {
 
     @Override
     public final void validate(JsonNode node) throws ValidationException {
+        if (node instanceof LazyJsonNode) {
+            validate(((LazyJsonNode)node).getJsonNode());
+            return;
+        }
         if (!(node instanceof JacksonNode)) {
             throw new IllegalArgumentException("node is not an intance of " + JacksonNode.class.getSimpleName());
         }

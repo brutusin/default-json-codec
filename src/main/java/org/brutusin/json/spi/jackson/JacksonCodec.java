@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.io.JsonStringEncoder;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
 import java.io.IOException;
 import org.brutusin.commons.json.spi.JsonNode;
@@ -114,6 +115,16 @@ public class JacksonCodec extends JsonCodec {
     @Override
     public String quoteAsUTF8(String s) {
         return new String(JsonStringEncoder.getInstance().quoteAsUTF8(s));
+    }
+
+    @Override
+    public String prettyPrint(String json) throws ParseException {
+        try {
+            Object obj = parse(json, Object.class);
+            return mapper.writer().withDefaultPrettyPrinter().writeValueAsString(obj);
+        } catch (JsonProcessingException ex) {
+            throw new ParseException(ex);
+        }
     }
 
     private com.fasterxml.jackson.databind.JsonNode load(String json) throws ParseException {
