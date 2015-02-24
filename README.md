@@ -6,7 +6,7 @@ Service provider for [JsonCodec SPI](https://github.com/brutusin/commons/tree/ma
 * [com.github.fge:json-schema-validator](https://github.com/fge/json-schema-validator): For validation against a JSON schema
 
 
-See [ServiceLoader](http://docs.oracle.com/javase/6/docs/api/java/util/ServiceLoader.html) for more details.
+See [ServiceLoader](http://docs.oracle.com/javase/6/docs/api/java/util/ServiceLoader.html) for additional information.
 
 ## Support, bugs and requests
 https://github.com/brutusin/json-codec-jackson/issues
