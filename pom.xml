@@ -31,7 +31,7 @@
         <tag>HEAD</tag>
     </scm>
     <properties>
-        <json.version>1.0.0-SNAPSHOT</json.version>
+        <commons.version>1.3.2</commons.version>
     </properties>
     <dependencies>
         <dependency>
@@ -41,15 +41,15 @@
         </dependency>
         <dependency>
             <groupId>org.brutusin</groupId>
-            <artifactId>json</artifactId>
+            <artifactId>commons</artifactId>
             <type>test-jar</type>
-            <version>${json.version}</version>
+            <version>${commons.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.brutusin</groupId>
-            <artifactId>json</artifactId>
-            <version>${json.version}</version>
+            <artifactId>commons</artifactId>
+            <version>${commons.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
