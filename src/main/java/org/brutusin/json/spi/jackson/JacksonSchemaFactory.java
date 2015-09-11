@@ -27,9 +27,9 @@ import com.fasterxml.jackson.module.jsonSchema.types.SimpleTypeSchema;
 import com.fasterxml.jackson.module.jsonSchema.types.StringSchema;
 import java.lang.reflect.Method;
 import java.util.List;
-import org.brutusin.commons.json.annotations.IndexableProperty;
-import org.brutusin.commons.json.annotations.JsonProperty;
-import org.brutusin.commons.json.spi.JsonCodec;
+import org.brutusin.json.annotations.IndexableProperty;
+import org.brutusin.json.annotations.JsonProperty;
+import org.brutusin.json.spi.JsonCodec;
 
 /**
  *

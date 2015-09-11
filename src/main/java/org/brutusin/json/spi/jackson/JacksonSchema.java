@@ -25,11 +25,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import org.brutusin.commons.json.ParseException;
-import org.brutusin.commons.json.spi.JsonNode;
-import org.brutusin.commons.json.spi.JsonSchema;
-import org.brutusin.commons.json.ValidationException;
-import org.brutusin.commons.json.impl.LazyJsonNode;
+import org.brutusin.json.ParseException;
+import org.brutusin.json.spi.JsonNode;
+import org.brutusin.json.spi.JsonSchema;
+import org.brutusin.json.ValidationException;
+import org.brutusin.json.impl.LazyJsonNode;
 
 /**
  *

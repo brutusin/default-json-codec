@@ -15,7 +15,7 @@
  */
 package org.brutusin.json.spi.jackson;
 
-import org.brutusin.commons.json.spi.SchemaCodecTest;
+import org.brutusin.json.spi.SchemaCodecTest;
 
 /**
  *

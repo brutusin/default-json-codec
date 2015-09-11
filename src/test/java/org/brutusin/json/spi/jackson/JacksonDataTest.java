@@ -15,9 +15,9 @@
  */
 package org.brutusin.json.spi.jackson;
 
-import org.brutusin.commons.json.ParseException;
-import org.brutusin.commons.json.spi.DataCodecTest;
-import org.brutusin.commons.json.spi.JsonCodec;
+import org.brutusin.json.ParseException;
+import org.brutusin.json.spi.DataCodecTest;
+import org.brutusin.json.spi.JsonCodec;
 import org.junit.Test;
 
 /**

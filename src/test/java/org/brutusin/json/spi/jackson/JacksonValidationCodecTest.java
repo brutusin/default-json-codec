@@ -15,7 +15,7 @@
  */
 package org.brutusin.json.spi.jackson;
 
-import org.brutusin.commons.json.spi.ValidationCodecTest;
+import org.brutusin.json.spi.ValidationCodecTest;
 
 /**
  *

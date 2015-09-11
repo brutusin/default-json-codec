@@ -17,7 +17,7 @@ package org.brutusin.json.spi.jackson;
 
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import java.util.Iterator;
-import org.brutusin.commons.json.spi.JsonNode;
+import org.brutusin.json.spi.JsonNode;
 
 /**
  *

@@ -23,10 +23,10 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
 import java.io.IOException;
-import org.brutusin.commons.json.spi.JsonNode;
-import org.brutusin.commons.json.spi.JsonSchema;
-import org.brutusin.commons.json.ParseException;
-import org.brutusin.commons.json.spi.JsonCodec;
+import org.brutusin.json.spi.JsonNode;
+import org.brutusin.json.spi.JsonSchema;
+import org.brutusin.json.ParseException;
+import org.brutusin.json.spi.JsonCodec;
 
 /**
  * @author Ignacio del Valle Alles idelvall@brutusin.org
