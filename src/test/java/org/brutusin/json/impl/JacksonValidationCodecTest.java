@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.brutusin.json.spi.jackson;
+package org.brutusin.json.impl;
+
+import org.brutusin.json.spi.ValidationCodecTest;
 
 /**
  *
  * @author Ignacio del Valle Alles idelvall@brutusin.org
  */
-public class ExpressionTest extends org.brutusin.json.impl.ExpressionTest {
-
+public class JacksonValidationCodecTest extends ValidationCodecTest {
 }

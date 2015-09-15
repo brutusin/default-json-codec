@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.brutusin.json.spi.jackson;
+package org.brutusin.json.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,11 +25,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.brutusin.json.ParseException;
 import org.brutusin.json.spi.JsonNode;
 import org.brutusin.json.spi.JsonSchema;
 import org.brutusin.json.ValidationException;
-import org.brutusin.json.impl.LazyJsonNode;
+import org.brutusin.json.spi.JsonCodec;
+import org.brutusin.json.util.LazyJsonNode;
 
 /**
  *
@@ -61,11 +64,15 @@ public class JacksonSchema extends JacksonNode implements JsonSchema {
     @Override
     public final void validate(JsonNode node) throws ValidationException {
         if (node instanceof LazyJsonNode) {
-            validate(((LazyJsonNode)node).getJsonNode());
+            validate(((LazyJsonNode) node).getJsonNode());
             return;
         }
         if (!(node instanceof JacksonNode)) {
-            throw new IllegalArgumentException("node is not an intance of " + JacksonNode.class.getSimpleName());
+            try {
+                node = JsonCodec.getInstance().parse(node.toString());
+            } catch (ParseException ex) {
+                throw new AssertionError(ex);
+            }
         }
         JacksonNode nodeImpl = (JacksonNode) node;
         ProcessingReport report = null;

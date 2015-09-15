@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.brutusin.json.spi.jackson;
+package org.brutusin.json.impl;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -26,6 +26,7 @@ import java.io.IOException;
 import org.brutusin.json.spi.JsonNode;
 import org.brutusin.json.spi.JsonSchema;
 import org.brutusin.json.ParseException;
+import org.brutusin.json.spi.Expression;
 import org.brutusin.json.spi.JsonCodec;
 
 /**
@@ -137,5 +138,10 @@ public class JacksonCodec extends JsonCodec {
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    @Override
+    public Expression compile(String expression) {
+        return ExpressionImpl.compile(expression);
     }
 }
