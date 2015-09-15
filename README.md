@@ -18,7 +18,7 @@ This module defines its own expression semantics, supporting both data, and sche
 | `[<number>]` | number-th element in the array                                            |Schema of the element node
 | `[$]` | Last element in the array | Schema of the element node
 
-See [ExpressionTest](src/test/java/org/brutusin/json/spi/jackson/ExpressionTest.java) for some examples.
+See [ExpressionTest](src/test/java/org/brutusin/json/impl/ExpressionTest.java) for some examples.
 
 ## Support, bugs and requests
 https://github.com/brutusin/json-provider/issues
