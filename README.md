@@ -5,8 +5,27 @@ Service provider for [org.brutusin:json SPI](https://github.com/brutusin/json), 
 * [com.fasterxml.jackson.module:jackson-module-jsonSchema](https://github.com/FasterXML/jackson-module-jsonSchema): For java class to JSON schema mapping 
 * [com.github.fge:json-schema-validator](https://github.com/fge/json-schema-validator): For validation against a JSON schema
 
+##Expression DSL
+This module defines its own expression semantics, supporting both data, and schema projections (wildcard expressions evaluating to multiple nodes), and also keeping explicit information of the schema structure.
 
-See [ServiceLoader](http://docs.oracle.com/javase/6/docs/api/java/util/ServiceLoader.html) for additional information.
+Case | Expression
+-----| -----------------
+Root node| `$`
+Simple property| `$.id`
+Nested property| `$.header.id`
+Array/Collection property| `$.items[#]`
+Map property (additionalProperty in schema)| `$.map` for keys and `$.map[*]` for values
+
+
+| Operator                  | Applied to JsonNode  | Applied to JsonSchema
+| :------------------------ | :------------------- |:-------------------- |
+| `$`                       | The root node        | Schema of root node |
+| `.<name>`                 | Dot-notated child    | Schema of child node
+| `#`                       | Numeric wildcard. Selects all elements of an array | Schema of the array node
+| `*`                       | String wildcard. Selects all elements of an array | Schema of the object node. Only valid in schemas having additionalProperties
+| `['<name>']` | Bracket-notated child or children | Only valid in schemas having additionalProperties. Otherwise use dot-notation |                                 |
+| `[<number>]` | number-th element in the array                                            |Schema of the element node
+| `[$]` | Last element in the array | Schema of the element node
 
 ## Support, bugs and requests
 https://github.com/brutusin/json-provider/issues
