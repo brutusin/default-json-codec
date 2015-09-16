@@ -20,6 +20,11 @@ This module defines its own expression semantics, supporting both data, and sche
 
 See [ExpressionTest](src/test/java/org/brutusin/json/impl/ExpressionTest.java) for some examples.
 
+## ToDos
+Add more features similar to those in xpath like. 
+- Filters
+- Functions 
+
 ## Support, bugs and requests
 https://github.com/brutusin/json-provider/issues
 
