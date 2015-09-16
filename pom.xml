@@ -30,6 +30,7 @@
         <developerConnection>scm:git:https://github.com/brutusin/json-provider.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
+    
     <properties>
         <json.version>1.0.0</json.version>
     </properties>
