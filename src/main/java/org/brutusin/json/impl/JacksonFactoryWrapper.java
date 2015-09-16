@@ -19,7 +19,6 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.module.jsonSchema.factories.FormatVisitorFactory;
 import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
-import com.fasterxml.jackson.module.jsonSchema.factories.Visitor;
 import com.fasterxml.jackson.module.jsonSchema.factories.VisitorContext;
 import com.fasterxml.jackson.module.jsonSchema.factories.WrapperFactory;
 
@@ -62,9 +61,7 @@ public class JacksonFactoryWrapper extends SchemaFactoryWrapper {
     }
 
     @Override
-    public Visitor setVisitorContext(VisitorContext rvc) {
+    public SchemaFactoryWrapper setVisitorContext(VisitorContext rvc) {
         return this;
     }
-    
-    
 }
