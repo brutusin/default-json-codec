@@ -6,7 +6,7 @@ Service provider for [org.brutusin:json SPI](https://github.com/brutusin/json), 
 * [com.github.fge:json-schema-validator](https://github.com/fge/json-schema-validator): For validation against a JSON schema
 
 ##Expression DSL
-This module defines its own expression semantics, supporting both data, and schema projections (wildcard expressions evaluating to multiple nodes), and also keeping explicit information of the schema structure.
+This module defines its own expression semantics, supporting both data, and schema projections (wildcard expressions evaluating to multiple nodes), and also keeping explicit information of the schema structure, what is usefull to validate that a reusable expression is applied to a node of the same structure that the original one.
 
 | Operator                  | Applied to JsonNode  | Applied to JsonSchema
 | :------------------------ | :------------------- |:-------------------- |
