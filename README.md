@@ -6,7 +6,7 @@ Service provider for [org.brutusin:json SPI](https://github.com/brutusin/json), 
 * [com.github.fge:json-schema-validator](https://github.com/fge/json-schema-validator): For validation against a JSON schema
 
 ##Expression DSL
-This module defines its own expression semantics, supporting both data, and schema projections (wildcard expressions evaluating to multiple nodes), and also keeping explicit information of the schema structure, what is usefull to validate that a reusable expression is applied to a node of the same structure that the original one.
+This module defines its own expression semantics, supporting data and schema projections (wildcard expressions evaluating to multiple nodes), and also keeping explicit information of the schema structure, what is useful to validate that a reusable expression is applied to a node of the same structure that the original one (this is the main point for not adopting [JsonPath](https://github.com/jayway/JsonPath) semantics).
 
 | Operator                  | Applied to JsonNode  | Applied to JsonSchema
 | :------------------------ | :------------------- |:-------------------- |
@@ -21,7 +21,7 @@ This module defines its own expression semantics, supporting both data, and sche
 See [ExpressionTest](src/test/java/org/brutusin/json/impl/ExpressionTest.java) for some examples.
 
 ## ToDos
-Add more features similar to those in XPATH like: 
+Add more features similar to those in [XPath](https://en.wikipedia.org/wiki/XPath) like: 
 * Filters
 * Functions 
 
