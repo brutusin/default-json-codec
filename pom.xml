@@ -31,7 +31,7 @@
         <tag>HEAD</tag>
     </scm>
     <properties>
-        <json.version>1.0.0-SNAPSHOT</json.version>
+        <json.version>1.0.0</json.version>
     </properties>
     <dependencies>
         <dependency>
