@@ -27,6 +27,7 @@ import com.fasterxml.jackson.module.jsonSchema.types.SimpleTypeSchema;
 import com.fasterxml.jackson.module.jsonSchema.types.StringSchema;
 import java.lang.reflect.Method;
 import java.util.List;
+import org.brutusin.json.annotations.DependentProperty;
 import org.brutusin.json.annotations.IndexableProperty;
 import org.brutusin.json.annotations.JsonProperty;
 import org.brutusin.json.spi.JsonCodec;
@@ -40,7 +41,8 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
     void enrich(SimpleTypeSchema schema, BeanProperty beanProperty) {
         JsonProperty jsonAnnot = beanProperty.getAnnotation(JsonProperty.class);
         IndexableProperty indexAnnot = beanProperty.getAnnotation(IndexableProperty.class);
-
+        DependentProperty dependsAnnot = beanProperty.getAnnotation(DependentProperty.class);
+        
         if (jsonAnnot == null) {
             schema.setTitle(beanProperty.getName());
         } else {
@@ -61,14 +63,27 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
                     throw new Error("Error setting default value for " + beanProperty.getFullName(), parseException);
                 }
             }
-            String values = jsonAnnot.values();
-            if (values != null) {
+            String valuesMethodName = jsonAnnot.valuesMethod();
+            if (valuesMethodName != null && !valuesMethodName.isEmpty()) {
                 try {
-                    Object valuesValue = JsonCodec.getInstance().parse(values, List.class);
+                    Method valuesMethod = beanProperty.getMember().getDeclaringClass().getMethod(valuesMethodName, null);
+                    valuesMethod.setAccessible(true);
+                    Object valuesValue = valuesMethod.invoke(null, null);
                     Method method = schema.getClass().getMethod("setValues", List.class);
                     method.invoke(schema, valuesValue);
-                } catch (Exception parseException) {
-                    throw new Error("Error setting enum value for " + beanProperty.getFullName(), parseException);
+                } catch (Exception ex) {
+                    throw new Error("Error setting dynamic enum value for " + beanProperty.getFullName(), ex);
+                }
+            } else {
+                String values = jsonAnnot.values();
+                if (values != null && !values.isEmpty()) {
+                    try {
+                        Object valuesValue = JsonCodec.getInstance().parse(values, List.class);
+                        Method method = schema.getClass().getMethod("setValues", List.class);
+                        method.invoke(schema, valuesValue);
+                    } catch (Exception parseException) {
+                        throw new Error("Error setting enum value for " + beanProperty.getFullName(), parseException);
+                    }
                 }
             }
         }
@@ -78,6 +93,14 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
                 method.invoke(schema, indexAnnot.mode());
             } catch (Exception parseException) {
                 throw new Error("Error setting enum value for " + beanProperty.getFullName(), parseException);
+            }
+        }
+        if (dependsAnnot != null) {
+            try {
+                Method method = schema.getClass().getMethod("setDependsOn", String[].class);
+                method.invoke(schema, (Object)dependsAnnot.dependsOn());
+            } catch (Exception parseException) {
+                throw new Error("Error setting dependsOn value for " + beanProperty.getFullName(), parseException);
             }
         }
     }
@@ -91,6 +114,8 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
             private List values;
             @com.fasterxml.jackson.annotation.JsonProperty
             private IndexableProperty.IndexMode index;
+            @com.fasterxml.jackson.annotation.JsonProperty
+            private String[] dependsOn;
 
             public Object getDef() {
                 return def;
@@ -116,6 +141,14 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
                 this.index = index;
             }
 
+            public String[] getDependsOn() {
+                return dependsOn;
+            }
+
+            public void setDependsOn(String[] dependsOn) {
+                this.dependsOn = dependsOn;
+            }
+
             @Override
             public void enrichWithBeanProperty(BeanProperty beanProperty) {
                 enrich(this, beanProperty);
@@ -132,6 +165,16 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
             private List values;
             @com.fasterxml.jackson.annotation.JsonProperty
             private IndexableProperty.IndexMode index;
+            @com.fasterxml.jackson.annotation.JsonProperty
+            private String[] dependsOn;
+
+            public String[] getDependsOn() {
+                return dependsOn;
+            }
+
+            public void setDependsOn(String[] dependsOn) {
+                this.dependsOn = dependsOn;
+            }
 
             public Object getDef() {
                 return def;
@@ -173,6 +216,16 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
             private List values;
             @com.fasterxml.jackson.annotation.JsonProperty
             private IndexableProperty.IndexMode index;
+            @com.fasterxml.jackson.annotation.JsonProperty
+            private String[] dependsOn;
+
+            public String[] getDependsOn() {
+                return dependsOn;
+            }
+
+            public void setDependsOn(String[] dependsOn) {
+                this.dependsOn = dependsOn;
+            }
 
             public Object getDef() {
                 return def;
@@ -214,6 +267,16 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
             private List values;
             @com.fasterxml.jackson.annotation.JsonProperty
             private IndexableProperty.IndexMode index;
+            @com.fasterxml.jackson.annotation.JsonProperty
+            private String[] dependsOn;
+
+            public String[] getDependsOn() {
+                return dependsOn;
+            }
+
+            public void setDependsOn(String[] dependsOn) {
+                this.dependsOn = dependsOn;
+            }
 
             public Object getDef() {
                 return def;
@@ -255,6 +318,16 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
             private List values;
             @com.fasterxml.jackson.annotation.JsonProperty
             private IndexableProperty.IndexMode index;
+            @com.fasterxml.jackson.annotation.JsonProperty
+            private String[] dependsOn;
+
+            public String[] getDependsOn() {
+                return dependsOn;
+            }
+
+            public void setDependsOn(String[] dependsOn) {
+                this.dependsOn = dependsOn;
+            }
 
             public Object getDef() {
                 return def;
@@ -296,6 +369,16 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
             private List values;
             @com.fasterxml.jackson.annotation.JsonProperty
             private IndexableProperty.IndexMode index;
+            @com.fasterxml.jackson.annotation.JsonProperty
+            private String[] dependsOn;
+
+            public String[] getDependsOn() {
+                return dependsOn;
+            }
+
+            public void setDependsOn(String[] dependsOn) {
+                this.dependsOn = dependsOn;
+            }
 
             public Object getDef() {
                 return def;
@@ -337,6 +420,16 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
             private List values;
             @com.fasterxml.jackson.annotation.JsonProperty
             private IndexableProperty.IndexMode index;
+            @com.fasterxml.jackson.annotation.JsonProperty
+            private String[] dependsOn;
+
+            public String[] getDependsOn() {
+                return dependsOn;
+            }
+
+            public void setDependsOn(String[] dependsOn) {
+                this.dependsOn = dependsOn;
+            }
 
             public Object getDef() {
                 return def;
@@ -378,6 +471,16 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
             private List values;
             @com.fasterxml.jackson.annotation.JsonProperty
             private IndexableProperty.IndexMode index;
+            @com.fasterxml.jackson.annotation.JsonProperty
+            private String[] dependsOn;
+
+            public String[] getDependsOn() {
+                return dependsOn;
+            }
+
+            public void setDependsOn(String[] dependsOn) {
+                this.dependsOn = dependsOn;
+            }
 
             public Object getDef() {
                 return def;

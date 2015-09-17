@@ -16,11 +16,21 @@
 package org.brutusin.json.impl;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.TreeNode;
+import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.core.io.JsonStringEncoder;
+import com.fasterxml.jackson.core.json.JsonWriteContext;
+import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
 import java.io.IOException;
 import org.brutusin.json.spi.JsonNode;
@@ -45,6 +55,43 @@ public class JacksonCodec extends JsonCodec {
         if (mapper == null) {
             mapper = new ObjectMapper();
             mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            SimpleModule testModule = new SimpleModule("json-provider-module", new Version(1, 0, 0, null, "org.brutusin", "json-provider"));
+            testModule.addSerializer(new StdSerializer<JsonNode>(JsonNode.class) {
+                @Override
+                public void serialize(JsonNode value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+                    JsonWriteContext ctx = (JsonWriteContext) gen.getOutputContext();
+
+                    int status = ctx.writeValue();
+                    switch (status) {
+                        case JsonWriteContext.STATUS_OK_AFTER_COMMA:
+                            gen.writeRaw(',');
+                            break;
+                        case JsonWriteContext.STATUS_OK_AFTER_COLON:
+                            gen.writeRaw(':');
+                            break;
+                        case JsonWriteContext.STATUS_OK_AFTER_SPACE:
+                            gen.writeRaw(' ');
+                            break;
+                    };
+                    if (value == null) {
+                        gen.writeRaw("null");
+                    } else {
+                        gen.writeRaw(value.toString());
+                    }
+                }
+            });
+            testModule.addDeserializer(JsonNode.class, new StdDeserializer<JsonNode>(JsonNode.class) {
+                @Override
+                public JsonNode deserialize(JsonParser jp, DeserializationContext dc) throws IOException, JsonProcessingException {
+                    try {
+                        TreeNode tree = jp.getCodec().readTree(jp);
+                        return JsonCodec.getInstance().parse(tree.toString());
+                    } catch (ParseException ex) {
+                        throw new JsonParseException(ex.getMessage(), null);
+                    }
+                }
+            });
+            mapper.registerModule(testModule);
         }
         if (schemaFactory == null) {
             schemaFactory = new JacksonFactoryWrapper();
