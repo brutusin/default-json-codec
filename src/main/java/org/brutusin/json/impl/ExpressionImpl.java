@@ -392,7 +392,7 @@ public class ExpressionImpl implements Expression {
                 }
                 if (hasAddp) {
                     name = name + currentToken;
-                    return getSubSchema(name, tokens, schema.getAdditionalPropertySchema());
+                    return getSubSchema(name, tokens, schema.getAdditionalPropertiesSchema());
                 } else {
                     throw new IllegalArgumentException("Node '" + name + "' has not additionalProperties, so [] notation is illegal");
                 }
@@ -405,7 +405,7 @@ public class ExpressionImpl implements Expression {
                 if (hasProp) {
                     return getSubSchema(name, tokens, schema.getPropertySchema(currentToken));
                 } else if (hasAddp) {
-                    return getSubSchema(name, tokens, schema.getAdditionalPropertySchema());
+                    return getSubSchema(name, tokens, schema.getAdditionalPropertiesSchema());
                 } else {
                     return getSubSchema(name, tokens, null);
                 }
