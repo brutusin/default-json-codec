@@ -15,6 +15,7 @@
  */
 package org.brutusin.json.impl;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.module.jsonSchema.types.AnySchema;
 import com.fasterxml.jackson.module.jsonSchema.types.ArraySchema;
@@ -42,7 +43,7 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
         JsonProperty jsonAnnot = beanProperty.getAnnotation(JsonProperty.class);
         IndexableProperty indexAnnot = beanProperty.getAnnotation(IndexableProperty.class);
         DependentProperty dependsAnnot = beanProperty.getAnnotation(DependentProperty.class);
-        
+
         if (jsonAnnot == null) {
             schema.setTitle(beanProperty.getName());
         } else {
@@ -98,7 +99,7 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
         if (dependsAnnot != null) {
             try {
                 Method method = schema.getClass().getMethod("setDependsOn", String[].class);
-                method.invoke(schema, (Object)dependsAnnot.dependsOn());
+                method.invoke(schema, (Object) dependsAnnot.dependsOn());
             } catch (Exception parseException) {
                 throw new Error("Error setting dependsOn value for " + beanProperty.getFullName(), parseException);
             }
@@ -116,6 +117,8 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
             private IndexableProperty.IndexMode index;
             @com.fasterxml.jackson.annotation.JsonProperty
             private String[] dependsOn;
+            @JsonIgnore
+            public String id;
 
             public Object getDef() {
                 return def;
@@ -149,6 +152,12 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
                 this.dependsOn = dependsOn;
             }
 
+            @JsonIgnore
+            @Override
+            public String getId() {
+                return super.getId();
+            }
+
             @Override
             public void enrichWithBeanProperty(BeanProperty beanProperty) {
                 enrich(this, beanProperty);
@@ -167,6 +176,14 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
             private IndexableProperty.IndexMode index;
             @com.fasterxml.jackson.annotation.JsonProperty
             private String[] dependsOn;
+            @JsonIgnore
+            public String id;
+
+            @JsonIgnore
+            @Override
+            public String getId() {
+                return super.getId();
+            }
 
             public String[] getDependsOn() {
                 return dependsOn;
@@ -218,6 +235,14 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
             private IndexableProperty.IndexMode index;
             @com.fasterxml.jackson.annotation.JsonProperty
             private String[] dependsOn;
+            @JsonIgnore
+            public String id;
+
+            @JsonIgnore
+            @Override
+            public String getId() {
+                return super.getId();
+            }
 
             public String[] getDependsOn() {
                 return dependsOn;
@@ -269,6 +294,14 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
             private IndexableProperty.IndexMode index;
             @com.fasterxml.jackson.annotation.JsonProperty
             private String[] dependsOn;
+            @JsonIgnore
+            public String id;
+
+            @JsonIgnore
+            @Override
+            public String getId() {
+                return super.getId();
+            }
 
             public String[] getDependsOn() {
                 return dependsOn;
@@ -320,6 +353,14 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
             private IndexableProperty.IndexMode index;
             @com.fasterxml.jackson.annotation.JsonProperty
             private String[] dependsOn;
+            @JsonIgnore
+            public String id;
+
+            @JsonIgnore
+            @Override
+            public String getId() {
+                return super.getId();
+            }
 
             public String[] getDependsOn() {
                 return dependsOn;
@@ -372,6 +413,15 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
             @com.fasterxml.jackson.annotation.JsonProperty
             private String[] dependsOn;
 
+            @JsonIgnore
+            public String id;
+
+            @JsonIgnore
+            @Override
+            public String getId() {
+                return super.getId();
+            }
+
             public String[] getDependsOn() {
                 return dependsOn;
             }
@@ -423,6 +473,15 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
             @com.fasterxml.jackson.annotation.JsonProperty
             private String[] dependsOn;
 
+            @JsonIgnore
+            public String id;
+
+            @JsonIgnore
+            @Override
+            public String getId() {
+                return super.getId();
+            }
+
             public String[] getDependsOn() {
                 return dependsOn;
             }
@@ -464,6 +523,7 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
 
     @Override
     public StringSchema stringSchema() {
+
         return new StringSchema() {
             @com.fasterxml.jackson.annotation.JsonProperty("default")
             private Object def;
@@ -473,6 +533,12 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
             private IndexableProperty.IndexMode index;
             @com.fasterxml.jackson.annotation.JsonProperty
             private String[] dependsOn;
+
+            @JsonIgnore
+            @Override
+            public String getId() {
+                return super.getId();
+            }
 
             public String[] getDependsOn() {
                 return dependsOn;
