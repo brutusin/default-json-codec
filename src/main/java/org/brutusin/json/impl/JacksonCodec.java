@@ -36,7 +36,6 @@ import java.io.IOException;
 import org.brutusin.json.spi.JsonNode;
 import org.brutusin.json.spi.JsonSchema;
 import org.brutusin.json.ParseException;
-import org.brutusin.json.spi.Expression;
 import org.brutusin.json.spi.JsonCodec;
 
 /**
@@ -185,10 +184,5 @@ public class JacksonCodec extends JsonCodec {
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
-    }
-
-    @Override
-    public Expression compile(String expression) {
-        return ExpressionImpl.compile(expression);
     }
 }
