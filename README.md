@@ -5,26 +5,6 @@ Service provider for [org.brutusin:json SPI](https://github.com/brutusin/json), 
 * [com.fasterxml.jackson.module:jackson-module-jsonSchema](https://github.com/FasterXML/jackson-module-jsonSchema): For java class to JSON schema mapping 
 * [com.github.fge:json-schema-validator](https://github.com/fge/json-schema-validator): For validation against a JSON schema
 
-##Expression DSL
-This module defines its own expression semantics, supporting data and schema projections (wildcard expressions evaluating to multiple nodes), and also keeping explicit information of the schema structure, what is useful to validate that a reusable expression is applied to a node of the same structure that the original one (this is the main point for not adopting [JsonPath](https://github.com/jayway/JsonPath) semantics).
-
-| Operator                  | Applied to JsonNode  | Applied to JsonSchema
-| :------------------------ | :------------------- |:-------------------- |
-| `$`                       | The root node        | Schema of root node |
-| `.<name>`                 | Dot-notated child    | Schema of child node
-| `#`                       | Numeric wildcard. Selects all elements of an array | Schema of the array node
-| `*`                       | String wildcard. Selects all properties of an object | Schema of the object node. Only valid in schemas having additionalProperties
-| `['<name>']` | Bracket-notated child or children | Only valid in schemas having additionalProperties. Otherwise use dot-notation |                                 |
-| `[<number>]` | number-th element in the array                                            |Schema of the element node
-| `[$]` | Last element in the array | Schema of the element node
-
-See [ExpressionTest](src/test/java/org/brutusin/json/impl/ExpressionTest.java) for some examples.
-
-## ToDos
-Add more features similar to those in [XPath](https://en.wikipedia.org/wiki/XPath) like: 
-* Filters
-* Functions 
-
 ## Support, bugs and requests
 https://github.com/brutusin/json-provider/issues
 
