@@ -38,7 +38,6 @@ public class JacksonDataTest extends DataCodecTest {
         c.name="aaaaaa\nsadasdasdas\n\tdfsdfsd";
         System.out.println(JsonCodec.getInstance().transform(a));
         
-        
     }
 
     class A {

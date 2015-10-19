@@ -43,22 +43,24 @@ import org.brutusin.json.spi.JsonCodec;
  * @author Ignacio del Valle Alles idelvall@brutusin.org
  */
 public class JacksonCodec extends JsonCodec {
-
+    
     private final ObjectMapper mapper;
     private final SchemaFactoryWrapper schemaFactory;
-
+    
     public JacksonCodec() {
         this(null, null);
     }
-
+    
     public JacksonCodec(ObjectMapper mapper, SchemaFactoryWrapper schemaFactory) {
         if (mapper == null) {
             mapper = new ObjectMapper();
+            
             mapper.setVisibility(
                     mapper.getSerializationConfig().
                     getDefaultVisibilityChecker().
                     withFieldVisibility(JsonAutoDetect.Visibility.ANY).
-                    withGetterVisibility(JsonAutoDetect.Visibility.NONE));
+                    withGetterVisibility(JsonAutoDetect.Visibility.NONE).
+                    withIsGetterVisibility(JsonAutoDetect.Visibility.NONE));
             
             mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             
@@ -67,7 +69,7 @@ public class JacksonCodec extends JsonCodec {
                 @Override
                 public void serialize(JsonNode value, JsonGenerator gen, SerializerProvider provider) throws IOException {
                     JsonWriteContext ctx = (JsonWriteContext) gen.getOutputContext();
-
+                    
                     int status = ctx.writeValue();
                     switch (status) {
                         case JsonWriteContext.STATUS_OK_AFTER_COMMA:
@@ -106,7 +108,7 @@ public class JacksonCodec extends JsonCodec {
         this.mapper = mapper;
         this.schemaFactory = schemaFactory;
     }
-
+    
     public static String addDraftv3(String jsonSchema) {
         jsonSchema = jsonSchema.replaceAll("\"\\$schema\"\\s*:\\s*\"http://json-schema.org/draft-03/schema#\"\\s*,?", "");
         if (!jsonSchema.contains("\"$schema\"")) {
@@ -118,7 +120,7 @@ public class JacksonCodec extends JsonCodec {
         }
         return jsonSchema;
     }
-
+    
     @Override
     public String transform(Object o) {
         try {
@@ -127,13 +129,13 @@ public class JacksonCodec extends JsonCodec {
             throw new RuntimeException(ex);
         }
     }
-
+    
     @Override
     public JsonNode parse(String json) throws ParseException {
         com.fasterxml.jackson.databind.JsonNode node = load(json);
         return new JacksonNode(node);
     }
-
+    
     @Override
     public <T> T parse(String json, Class<T> clazz) throws ParseException {
         try {
@@ -149,12 +151,12 @@ public class JacksonCodec extends JsonCodec {
             throw new RuntimeException(ex);
         }
     }
-
+    
     @Override
     public JsonSchema parseSchema(String json) throws ParseException {
         return new JacksonSchema(json, mapper);
     }
-
+    
     @Override
     public String getSchemaString(Class clazz) {
         try {
@@ -165,12 +167,12 @@ public class JacksonCodec extends JsonCodec {
             throw new RuntimeException(ex);
         }
     }
-
+    
     @Override
     public String quoteAsUTF8(String s) {
         return new String(JsonStringEncoder.getInstance().quoteAsUTF8(s));
     }
-
+    
     @Override
     public String prettyPrint(String json) throws ParseException {
         try {
@@ -180,7 +182,7 @@ public class JacksonCodec extends JsonCodec {
             throw new ParseException(ex);
         }
     }
-
+    
     private com.fasterxml.jackson.databind.JsonNode load(String json) throws ParseException {
         if (json == null || json.trim().isEmpty()) {
             return null;
