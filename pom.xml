@@ -32,7 +32,7 @@
     </scm>
     
     <properties>
-        <json.version>1.0.2</json.version>
+        <json.version>1.0.3-SNAPSHOT</json.version>
     </properties>
     <dependencies>
         <dependency>

@@ -15,6 +15,7 @@
  */
 package org.brutusin.json.impl;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -53,7 +54,14 @@ public class JacksonCodec extends JsonCodec {
     public JacksonCodec(ObjectMapper mapper, SchemaFactoryWrapper schemaFactory) {
         if (mapper == null) {
             mapper = new ObjectMapper();
+            mapper.setVisibility(
+                    mapper.getSerializationConfig().
+                    getDefaultVisibilityChecker().
+                    withFieldVisibility(JsonAutoDetect.Visibility.ANY).
+                    withGetterVisibility(JsonAutoDetect.Visibility.NONE));
+            
             mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            
             SimpleModule testModule = new SimpleModule("json-provider-module", new Version(1, 0, 0, null, "org.brutusin", "json-provider"));
             testModule.addSerializer(new StdSerializer<JsonNode>(JsonNode.class) {
                 @Override
