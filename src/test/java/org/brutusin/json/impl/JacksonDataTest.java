@@ -16,8 +16,10 @@
 package org.brutusin.json.impl;
 
 import org.brutusin.json.ParseException;
+import org.brutusin.json.impl.serializers.SerializationContext;
 import org.brutusin.json.spi.DataCodecTest;
 import org.brutusin.json.spi.JsonCodec;
+import static org.junit.Assert.*;
 import org.junit.Test;
 
 /**
@@ -27,45 +29,60 @@ import org.junit.Test;
 public class JacksonDataTest extends DataCodecTest {
 
     @Test
-    public void testComposite() throws ParseException{
+    public void testComposite() throws ParseException {
         A a = new A();
         B b = new B();
         C c = new C();
-        
-        c.name="Nacho";
-        b.c=c;
-        a.b=b;
-        c.name="aaaaaa\nsadasdasdas\n\tdfsdfsd";
+
+        c.name = "Nacho";
+        b.c = c;
+        a.b = b;
+        c.name = "aaaaaa\nsadasdasdas\n\tdfsdfsd";
         System.out.println(JsonCodec.getInstance().transform(a));
-        
+
+    }
+
+    @Test
+    @Override
+    public void testInputStream() throws Exception {
+        super.testInputStream();
+        assertNull(SerializationContext.getCurrentContext());
     }
 
     class A {
+
         B b;
 
         public B getB() {
             return b;
         }
+
         public void setB(B b) {
             this.b = b;
         }
     }
 
     class B {
+
         C c;
+
         public C getC() {
             return c;
         }
+
         public void setC(C c) {
             this.c = c;
         }
     }
 
     class C {
+
         String name;
+
         public String getName() {
             return name;
         }
+
         public void setName(String name) {
             this.name = name;
         }

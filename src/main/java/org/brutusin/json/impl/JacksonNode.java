@@ -16,7 +16,10 @@
 package org.brutusin.json.impl;
 
 import com.fasterxml.jackson.databind.node.JsonNodeType;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.Iterator;
+import java.util.Map;
 import org.brutusin.json.spi.JsonNode;
 
 /**
@@ -26,12 +29,38 @@ import org.brutusin.json.spi.JsonNode;
 public class JacksonNode implements JsonNode {
 
     private final com.fasterxml.jackson.databind.JsonNode node;
+    private final Map<String, InputStream> streams;
+    private final JacksonNode parentNode;
 
     public JacksonNode(com.fasterxml.jackson.databind.JsonNode node) {
+        this(node, (JacksonNode) null);
+    }
+
+    public JacksonNode(com.fasterxml.jackson.databind.JsonNode node, Map<String, InputStream> streams) {
         if (node == null) {
             throw new IllegalArgumentException("node can not be null");
         }
         this.node = node;
+        this.streams = streams;
+        this.parentNode = null;
+    }
+
+    public JacksonNode(com.fasterxml.jackson.databind.JsonNode node, JacksonNode parentNode) {
+        if (node == null) {
+            throw new IllegalArgumentException("node can not be null");
+        }
+        this.node = node;
+        this.parentNode = parentNode;
+        this.streams = parentNode == null ? null : parentNode.getStreams();
+    }
+
+    public final Map<String, InputStream> getStreams() {
+        return streams;
+    }
+
+    @Override
+    public JacksonNode getParentNode() {
+        return parentNode;
     }
 
     @Override
@@ -52,6 +81,23 @@ public class JacksonNode implements JsonNode {
                 return Type.STRING;
             default:
                 return Type.ANY;
+        }
+    }
+
+    @Override
+    public InputStream asStream() {
+        if (getNodeType() != Type.STRING) {
+            throw new UnsupportedOperationException("Node is of type " + getNodeType());
+        }
+        String str = asString();
+        if (streams == null) {
+            return new ByteArrayInputStream(str.getBytes());
+        }
+        InputStream stream = streams.get(str);
+        if (stream == null) {
+            return new ByteArrayInputStream(str.getBytes());
+        } else {
+            return stream;
         }
     }
 
@@ -91,7 +137,7 @@ public class JacksonNode implements JsonNode {
         if (nodeImpl == null) {
             return null;
         }
-        return new JacksonNode(nodeImpl);
+        return new JacksonNode(nodeImpl, this);
     }
 
     @Override
@@ -105,7 +151,7 @@ public class JacksonNode implements JsonNode {
         if (nodeImpl == null) {
             return null;
         }
-        return new JacksonNode(nodeImpl);
+        return new JacksonNode(nodeImpl, this);
     }
 
     @Override
@@ -118,7 +164,7 @@ public class JacksonNode implements JsonNode {
         if (!(obj instanceof JacksonNode)) {
             return false;
         }
-        return this.node.equals(((JacksonNode)obj).getNode());
+        return this.node.equals(((JacksonNode) obj).getNode());
     }
 
     @Override

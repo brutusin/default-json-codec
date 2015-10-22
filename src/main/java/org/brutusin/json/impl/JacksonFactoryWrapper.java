@@ -17,10 +17,13 @@ package org.brutusin.json.impl;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonAnyFormatVisitor;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonStringFormatVisitor;
 import com.fasterxml.jackson.module.jsonSchema.factories.FormatVisitorFactory;
 import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
 import com.fasterxml.jackson.module.jsonSchema.factories.VisitorContext;
 import com.fasterxml.jackson.module.jsonSchema.factories.WrapperFactory;
+import java.util.Map;
 
 /**
  *
@@ -28,15 +31,17 @@ import com.fasterxml.jackson.module.jsonSchema.factories.WrapperFactory;
  */
 public class JacksonFactoryWrapper extends SchemaFactoryWrapper {
 
+    private final Map<Class, String> formatMap;
+
     private final WrapperFactory wrapperFactory = new WrapperFactory() {
         @Override
         public SchemaFactoryWrapper getWrapper(SerializerProvider p) {
-            return new JacksonFactoryWrapper(p);
+            return new JacksonFactoryWrapper(p, formatMap);
         }
 
         @Override
         public SchemaFactoryWrapper getWrapper(SerializerProvider provider, VisitorContext rvc) {
-            JacksonFactoryWrapper wrapper = new JacksonFactoryWrapper(provider);
+            JacksonFactoryWrapper wrapper = new JacksonFactoryWrapper(provider, formatMap);
             wrapper.setVisitorContext(rvc);
             return wrapper;
         }
@@ -44,20 +49,63 @@ public class JacksonFactoryWrapper extends SchemaFactoryWrapper {
     };
 
     public JacksonFactoryWrapper() {
-        this(null);
+        this(null, null);
+    }
+    
+    public JacksonFactoryWrapper(Map<Class, String> formatMap) {
+        this(null, formatMap);
     }
 
     public JacksonFactoryWrapper(SerializerProvider p) {
-        super(p);
-        visitorFactory = new FormatVisitorFactory(wrapperFactory);
-        schemaProvider = new JacksonSchemaFactory();
+        this(p, null);
+    }
+
+    public JacksonFactoryWrapper(SerializerProvider p, Map<Class, String> formatMap) {
+        this.provider = p;
+        this.visitorFactory = new FormatVisitorFactory(wrapperFactory);
+        this.schemaProvider = new JacksonSchemaFactory();
+        this.formatMap = formatMap;
         // Disable using references:
-        this.visitorContext = new VisitorContext(){
+        this.visitorContext = new VisitorContext() {
             @Override
             public String getSeenSchemaUri(JavaType aSeenSchema) {
                 return null;
             }
         };
+    }
+
+    private String getFormat(Class clazz) {
+        if (formatMap == null || clazz == null) {
+            return null;
+        }
+        String format = formatMap.get(clazz);
+        if (format != null) {
+            return format;
+        }
+        return getFormat(clazz.getSuperclass());
+    }
+
+    @Override
+    public JsonAnyFormatVisitor expectAnyFormat(JavaType convertedType) {
+        String format = getFormat(convertedType.getRawClass());
+        if (format != null) {
+            StringSchema s = (StringSchema) schemaProvider.stringSchema();
+            s.setStringFormat(format);
+            schema = s;
+            return null;
+        }
+        return super.expectAnyFormat(convertedType);
+    }
+
+    @Override
+    public JsonStringFormatVisitor expectStringFormat(JavaType convertedType) {
+        StringSchema s = (StringSchema) schemaProvider.stringSchema();
+        schema = s;
+        String format = getFormat(convertedType.getRawClass());
+        if (format != null) {
+            s.setStringFormat(format);
+        }
+        return visitorFactory.stringFormatVisitor(s);
     }
 
     @Override

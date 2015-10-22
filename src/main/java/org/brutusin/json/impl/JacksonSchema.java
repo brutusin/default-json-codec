@@ -17,10 +17,14 @@ package org.brutusin.json.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonschema.cfg.ValidationConfiguration;
+import com.github.fge.jsonschema.cfg.ValidationConfigurationBuilder;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingMessage;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
+import com.github.fge.jsonschema.library.DraftV3Library;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
+import com.github.fge.jsonschema.main.JsonSchemaFactoryBuilder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -51,7 +55,7 @@ public class JacksonSchema extends JacksonNode implements JsonSchema {
             return null;
         }
         try {
-            return mapper.readTree(JacksonCodec.addDraftv3(schema));
+            return mapper.readTree(JacksonCodec.addVersion(schema));
         } catch (JsonProcessingException ex) {
             throw new ParseException(ex);
         } catch (IOException ex) {
@@ -77,6 +81,7 @@ public class JacksonSchema extends JacksonNode implements JsonSchema {
         try {
             report = getValidator().validate(nodeImpl.getNode());
         } catch (ProcessingException ex) {
+            ex.printStackTrace();
             List<String> messages = new ArrayList();
             messages.add(ex.getProcessingMessage().getMessage());
             throw new ValidationException(messages);
@@ -102,7 +107,9 @@ public class JacksonSchema extends JacksonNode implements JsonSchema {
         if (validator == null) {
             synchronized (this) {
                 if (validator == null) {
-                    validator = JsonSchemaFactory.byDefault().getJsonSchema(getNode());
+                    ValidationConfigurationBuilder cfgBuilder = ValidationConfiguration.newBuilder();
+                    cfgBuilder.addLibrary("http://brutusin.org/json", DraftV3Library.get());
+                    validator = JsonSchemaFactory.newBuilder().setValidationConfiguration(cfgBuilder.freeze()).freeze().getJsonSchema(getNode());
                 }
             }
         }

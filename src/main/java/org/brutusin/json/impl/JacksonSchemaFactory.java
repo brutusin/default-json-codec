@@ -25,7 +25,6 @@ import com.fasterxml.jackson.module.jsonSchema.types.NullSchema;
 import com.fasterxml.jackson.module.jsonSchema.types.NumberSchema;
 import com.fasterxml.jackson.module.jsonSchema.types.ObjectSchema;
 import com.fasterxml.jackson.module.jsonSchema.types.SimpleTypeSchema;
-import com.fasterxml.jackson.module.jsonSchema.types.StringSchema;
 import java.lang.reflect.Method;
 import java.util.List;
 import org.brutusin.json.annotations.DependentProperty;
@@ -521,61 +520,8 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
         };
     }
 
-    @Override
-    public StringSchema stringSchema() {
-
-        return new StringSchema() {
-            @com.fasterxml.jackson.annotation.JsonProperty("default")
-            private Object def;
-            @com.fasterxml.jackson.annotation.JsonProperty("enum")
-            private List values;
-            @com.fasterxml.jackson.annotation.JsonProperty
-            private IndexableProperty.IndexMode index;
-            @com.fasterxml.jackson.annotation.JsonProperty
-            private String[] dependsOn;
-
-            @JsonIgnore
-            @Override
-            public String getId() {
-                return super.getId();
-            }
-
-            public String[] getDependsOn() {
-                return dependsOn;
-            }
-
-            public void setDependsOn(String[] dependsOn) {
-                this.dependsOn = dependsOn;
-            }
-
-            public Object getDef() {
-                return def;
-            }
-
-            public void setDef(Object def) {
-                this.def = def;
-            }
-
-            public List getValues() {
-                return values;
-            }
-
-            public void setValues(List values) {
-                this.values = values;
-            }
-
-            public IndexableProperty.IndexMode getIndex() {
-                return index;
-            }
-
-            public void setIndex(IndexableProperty.IndexMode index) {
-                this.index = index;
-            }
-
-            @Override
-            public void enrichWithBeanProperty(BeanProperty beanProperty) {
-                enrich(this, beanProperty);
-            }
-        };
+     @Override
+    public com.fasterxml.jackson.module.jsonSchema.types.StringSchema stringSchema() {
+        return new StringSchema(this);
     }
 }

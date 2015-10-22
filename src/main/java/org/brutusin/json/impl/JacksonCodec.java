@@ -17,100 +17,90 @@ package org.brutusin.json.impl;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.core.io.JsonStringEncoder;
-import com.fasterxml.jackson.core.json.JsonWriteContext;
-import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import org.brutusin.commons.Pair;
 import org.brutusin.json.spi.JsonNode;
 import org.brutusin.json.spi.JsonSchema;
 import org.brutusin.json.ParseException;
+import org.brutusin.json.impl.serializers.InputStreamDeserializer;
+import org.brutusin.json.impl.serializers.InputStreamSerializer;
+import org.brutusin.json.impl.serializers.JsonNodeDeserializer;
+import org.brutusin.json.impl.serializers.JsonNodeSerializer;
+import org.brutusin.json.impl.serializers.SerializationContext;
 import org.brutusin.json.spi.JsonCodec;
 
 /**
  * @author Ignacio del Valle Alles idelvall@brutusin.org
  */
 public class JacksonCodec extends JsonCodec {
-    
+
+    private static final Map<Class, String> FORMAT_MAP = new HashMap();
+
+    static {
+        FORMAT_MAP.put(File.class, "file");
+        FORMAT_MAP.put(InputStream.class, "inputstream");
+    }
+
     private final ObjectMapper mapper;
     private final SchemaFactoryWrapper schemaFactory;
-    
+
     public JacksonCodec() {
         this(null, null);
     }
-    
+
     public JacksonCodec(ObjectMapper mapper, SchemaFactoryWrapper schemaFactory) {
         if (mapper == null) {
             mapper = new ObjectMapper();
-            
+
             mapper.setVisibility(
                     mapper.getSerializationConfig().
                     getDefaultVisibilityChecker().
                     withFieldVisibility(JsonAutoDetect.Visibility.ANY).
                     withGetterVisibility(JsonAutoDetect.Visibility.NONE).
                     withIsGetterVisibility(JsonAutoDetect.Visibility.NONE));
-            
+
             mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            
+
             SimpleModule testModule = new SimpleModule("json-provider-module", new Version(1, 0, 0, null, "org.brutusin", "json-provider"));
-            testModule.addSerializer(new StdSerializer<JsonNode>(JsonNode.class) {
-                @Override
-                public void serialize(JsonNode value, JsonGenerator gen, SerializerProvider provider) throws IOException {
-                    JsonWriteContext ctx = (JsonWriteContext) gen.getOutputContext();
-                    
-                    int status = ctx.writeValue();
-                    switch (status) {
-                        case JsonWriteContext.STATUS_OK_AFTER_COMMA:
-                            gen.writeRaw(',');
-                            break;
-                        case JsonWriteContext.STATUS_OK_AFTER_COLON:
-                            gen.writeRaw(':');
-                            break;
-                        case JsonWriteContext.STATUS_OK_AFTER_SPACE:
-                            gen.writeRaw(' ');
-                            break;
-                    };
-                    if (value == null) {
-                        gen.writeRaw("null");
-                    } else {
-                        gen.writeRaw(value.toString());
-                    }
-                }
-            });
-            testModule.addDeserializer(JsonNode.class, new StdDeserializer<JsonNode>(JsonNode.class) {
-                @Override
-                public JsonNode deserialize(JsonParser jp, DeserializationContext dc) throws IOException, JsonProcessingException {
-                    try {
-                        TreeNode tree = jp.getCodec().readTree(jp);
-                        return JsonCodec.getInstance().parse(tree.toString());
-                    } catch (ParseException ex) {
-                        throw new JsonParseException(ex.getMessage(), null);
-                    }
-                }
-            });
+            testModule.addSerializer(new JsonNodeSerializer());
+            testModule.addDeserializer(JsonNode.class, new JsonNodeDeserializer());
+            testModule.addSerializer(new InputStreamSerializer());
+            testModule.addDeserializer(InputStream.class, new InputStreamDeserializer());
             mapper.registerModule(testModule);
         }
         if (schemaFactory == null) {
-            schemaFactory = new JacksonFactoryWrapper();
+            schemaFactory = new JacksonFactoryWrapper(FORMAT_MAP);
         }
         this.mapper = mapper;
         this.schemaFactory = schemaFactory;
     }
-    
-    public static String addDraftv3(String jsonSchema) {
-        jsonSchema = jsonSchema.replaceAll("\"\\$schema\"\\s*:\\s*\"http://json-schema.org/draft-03/schema#\"\\s*,?", "");
+
+    static String addVersion(String jsonSchema) {
+        jsonSchema = jsonSchema.replaceAll("\"\\$schema\"\\s*:\\s*\"[^\"]*\"\\s*,?", "");
+        if (!jsonSchema.contains("\"$schema\"")) {
+            if (jsonSchema.startsWith("{\"type\":")) {
+                StringBuilder sb = new StringBuilder(jsonSchema);
+                sb.insert(1, "\"$schema\":\"http://brutusin.org/json\",");
+                return sb.toString();
+            }
+        }
+        return jsonSchema;
+    }
+
+    static String addDraftv3(String jsonSchema) {
+        jsonSchema = jsonSchema.replaceAll("\"\\$schema\"\\s*:\\s*\"[^\"]*\"\\s*,?", "");
         if (!jsonSchema.contains("\"$schema\"")) {
             if (jsonSchema.startsWith("{\"type\":")) {
                 StringBuilder sb = new StringBuilder(jsonSchema);
@@ -120,27 +110,59 @@ public class JacksonCodec extends JsonCodec {
         }
         return jsonSchema;
     }
-    
+
     @Override
     public String transform(Object o) {
+        return transformAndGetSerializationCtx(o).getElement1();
+    }
+
+    private Pair<String, Map> transformAndGetSerializationCtx(Object o) {
         try {
-            return mapper.writeValueAsString(o);
+            String json = mapper.writeValueAsString(o);
+            SerializationContext sCtx = SerializationContext.getCurrentContext();
+            return new Pair<String, Map>(json, sCtx == null ? null : sCtx.getMap());
         } catch (JsonProcessingException ex) {
             throw new RuntimeException(ex);
+        } finally {
+            SerializationContext.closeCurrentContext();
         }
     }
-    
+
+    @Override
+    public JsonNode toJsonNode(Object o) {
+        Pair<String, Map> pair = transformAndGetSerializationCtx(o);
+        try {
+            return parse(pair.getElement1(), pair.getElement2());
+        } catch (ParseException pe) {
+            throw new AssertionError();
+        }
+    }
+
     @Override
     public JsonNode parse(String json) throws ParseException {
-        com.fasterxml.jackson.databind.JsonNode node = load(json);
-        return new JacksonNode(node);
+        return parse(json, (Map) null);
     }
-    
+
+    @Override
+    public JsonNode parse(String json, Map<String, InputStream> streams) throws ParseException {
+        com.fasterxml.jackson.databind.JsonNode node = load(json);
+        return new JacksonNode(node, streams);
+    }
+
     @Override
     public <T> T parse(String json, Class<T> clazz) throws ParseException {
+        return parse(json, clazz, null);
+    }
+
+    @Override
+    public <T> T parse(String json, Class<T> clazz, Map<String, InputStream> streams) throws ParseException {
+        if (json == null || json.trim().isEmpty()) {
+            return null;
+        }
         try {
-            if (json == null || json.trim().isEmpty()) {
-                return null;
+            if (streams != null) {
+                SerializationContext sc = new SerializationContext(streams);
+                SerializationContext.setCurrentContext(sc);
             }
             return mapper.readValue(json, clazz);
         } catch (JsonParseException ex) {
@@ -149,30 +171,48 @@ public class JacksonCodec extends JsonCodec {
             throw new RuntimeException(ex);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
+        } finally {
+            SerializationContext.closeCurrentContext();
         }
     }
-    
+
+    @Override
+    public <T> T load(JsonNode node, Class<T> clazz) {
+        try {
+            Map<String, InputStream> streams;
+            if (node instanceof JacksonNode) {
+                JacksonNode jn = (JacksonNode) node;
+                streams = jn.getStreams();
+            } else {
+                streams = null;
+            }
+            return parse(node.toString(), clazz, streams);
+        } catch (ParseException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
     @Override
     public JsonSchema parseSchema(String json) throws ParseException {
         return new JacksonSchema(json, mapper);
     }
-    
+
     @Override
     public String getSchemaString(Class clazz) {
         try {
             mapper.acceptJsonFormatVisitor(mapper.constructType(clazz), schemaFactory);
             com.fasterxml.jackson.module.jsonSchema.JsonSchema finalSchema = schemaFactory.finalSchema();
-            return addDraftv3(mapper.writeValueAsString(finalSchema));
+            return addVersion(mapper.writeValueAsString(finalSchema));
         } catch (JsonProcessingException ex) {
             throw new RuntimeException(ex);
         }
     }
-    
+
     @Override
     public String quoteAsUTF8(String s) {
         return new String(JsonStringEncoder.getInstance().quoteAsUTF8(s));
     }
-    
+
     @Override
     public String prettyPrint(String json) throws ParseException {
         try {
@@ -182,7 +222,7 @@ public class JacksonCodec extends JsonCodec {
             throw new ParseException(ex);
         }
     }
-    
+
     private com.fasterxml.jackson.databind.JsonNode load(String json) throws ParseException {
         if (json == null || json.trim().isEmpty()) {
             return null;
