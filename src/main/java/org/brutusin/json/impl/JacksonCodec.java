@@ -46,21 +46,21 @@ import org.brutusin.json.spi.JsonCodec;
  */
 public class JacksonCodec extends JsonCodec {
 
-    private static final Map<Class, String> FORMAT_MAP = new HashMap();
+    private static final Map<Class, String> DEFAULT_FORMAT_MAP = new HashMap();
 
     static {
-        FORMAT_MAP.put(File.class, "file");
-        FORMAT_MAP.put(InputStream.class, "inputstream");
+        DEFAULT_FORMAT_MAP.put(File.class, "file");
+        DEFAULT_FORMAT_MAP.put(InputStream.class, "inputstream");
     }
 
     private final ObjectMapper mapper;
-    private final SchemaFactoryWrapper schemaFactory;
+    private final JacksonFactoryWrapper schemaFactory;
 
     public JacksonCodec() {
         this(null, null);
     }
 
-    public JacksonCodec(ObjectMapper mapper, SchemaFactoryWrapper schemaFactory) {
+    public JacksonCodec(ObjectMapper mapper, JacksonFactoryWrapper schemaFactory) {
         if (mapper == null) {
             mapper = new ObjectMapper();
 
@@ -81,7 +81,7 @@ public class JacksonCodec extends JsonCodec {
             mapper.registerModule(testModule);
         }
         if (schemaFactory == null) {
-            schemaFactory = new JacksonFactoryWrapper(FORMAT_MAP);
+            schemaFactory = new JacksonFactoryWrapper(new HashMap<Class, String>(DEFAULT_FORMAT_MAP));
         }
         this.mapper = mapper;
         this.schemaFactory = schemaFactory;
@@ -109,6 +109,11 @@ public class JacksonCodec extends JsonCodec {
             }
         }
         return jsonSchema;
+    }
+
+    @Override
+    public void registerStringFormat(Class clazz, String format) {
+        this.schemaFactory.registerStringFormat(clazz, format);
     }
 
     @Override
@@ -151,20 +156,29 @@ public class JacksonCodec extends JsonCodec {
 
     @Override
     public <T> T parse(String json, Class<T> clazz) throws ParseException {
-        return parse(json, clazz, null);
-    }
-
-    @Override
-    public <T> T parse(String json, Class<T> clazz, Map<String, InputStream> streams) throws ParseException {
         if (json == null || json.trim().isEmpty()) {
             return null;
         }
         try {
-            if (streams != null) {
-                SerializationContext sc = new SerializationContext(streams);
-                SerializationContext.setCurrentContext(sc);
-            }
             return mapper.readValue(json, clazz);
+        } catch (JsonParseException ex) {
+            throw new ParseException(ex);
+        } catch (JsonMappingException ex) {
+            throw new RuntimeException(ex);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    @Override
+    public <T> Pair<T, Integer> parse(String json, Class<T> clazz, Map<String, InputStream> streams) throws ParseException {
+        if (json == null || json.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            SerializationContext sc = new SerializationContext(streams);
+            SerializationContext.setCurrentContext(sc);
+            return new Pair<T, Integer>(mapper.readValue(json, clazz), sc.getDeclaredStreams());
         } catch (JsonParseException ex) {
             throw new ParseException(ex);
         } catch (JsonMappingException ex) {
@@ -186,7 +200,7 @@ public class JacksonCodec extends JsonCodec {
             } else {
                 streams = null;
             }
-            return parse(node.toString(), clazz, streams);
+            return parse(node.toString(), clazz, streams).getElement1();
         } catch (ParseException ex) {
             throw new RuntimeException(ex);
         }

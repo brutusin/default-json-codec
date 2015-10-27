@@ -45,13 +45,18 @@ public class JacksonFactoryWrapper extends SchemaFactoryWrapper {
             wrapper.setVisitorContext(rvc);
             return wrapper;
         }
-
     };
+
+    public void registerStringFormat(Class clazz, String format) {
+        if(!this.formatMap.containsKey(clazz)){
+            this.formatMap.put(clazz, format);
+        }
+    }
 
     public JacksonFactoryWrapper() {
         this(null, null);
     }
-    
+
     public JacksonFactoryWrapper(Map<Class, String> formatMap) {
         this(null, formatMap);
     }
@@ -75,14 +80,7 @@ public class JacksonFactoryWrapper extends SchemaFactoryWrapper {
     }
 
     private String getFormat(Class clazz) {
-        if (formatMap == null || clazz == null) {
-            return null;
-        }
-        String format = formatMap.get(clazz);
-        if (format != null) {
-            return format;
-        }
-        return getFormat(clazz.getSuperclass());
+        return formatMap.get(clazz);
     }
 
     @Override

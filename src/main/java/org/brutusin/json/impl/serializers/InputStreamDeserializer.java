@@ -21,8 +21,6 @@ import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.brutusin.json.ParseException;
 import org.brutusin.json.spi.JsonCodec;
 
@@ -45,7 +43,7 @@ public class InputStreamDeserializer extends StdDeserializer<InputStream> {
         TreeNode tree = jp.getCodec().readTree(jp);
         if (tree != null) {
             try {
-                return (InputStream) ctx.getMap().get(JsonCodec.getInstance().parse(tree.toString(), String.class));
+                return (InputStream) ctx.getInputStreamAndRegisterCount(JsonCodec.getInstance().parse(tree.toString(), String.class));
             } catch (ParseException ex) {
                throw new RuntimeException(ex);
             }

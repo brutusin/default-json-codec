@@ -34,7 +34,8 @@ public class SerializationContext {
 
     private final Map<InputStream, String> inverseMap;
     private final Map<String, InputStream> map;
-    private int counter;
+    private int addCounter;
+    private int getCounter;
 
     public SerializationContext() {
         this(null);
@@ -52,7 +53,6 @@ public class SerializationContext {
                 this.inverseMap.put(value, key);
             }
         }
-        this.counter = 1;
     }
 
     public static void setCurrentContext(SerializationContext ctx) {
@@ -70,15 +70,24 @@ public class SerializationContext {
     public String addStream(InputStream stream) {
         String str = inverseMap.get(stream);
         if (str == null) {
-            str = "#" + (counter++) + "#" + System.identityHashCode(stream);
+            str = "#" + (++addCounter) + "#" + System.identityHashCode(stream);
             inverseMap.put(stream, str);
             map.put(str, stream);
         }
         return str;
     }
 
+    public InputStream getInputStreamAndRegisterCount(String id) {
+        getCounter++;
+        return map.get(id);
+    }
+
     public Map<String, InputStream> getMap() {
         return map;
+    }
+
+    public int getDeclaredStreams() {
+        return getCounter;
     }
 
     public void clear() {
