@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import org.brutusin.commons.Pair;
+import org.brutusin.commons.io.MetaDataInputStream;
 import org.brutusin.json.spi.JsonNode;
 import org.brutusin.json.spi.JsonSchema;
 import org.brutusin.json.ParseException;
@@ -78,6 +79,7 @@ public class JacksonCodec extends JsonCodec {
             testModule.addDeserializer(JsonNode.class, new JsonNodeDeserializer());
             testModule.addSerializer(new InputStreamSerializer());
             testModule.addDeserializer(InputStream.class, new InputStreamDeserializer());
+            testModule.addDeserializer(MetaDataInputStream.class, new InputStreamDeserializer());
             mapper.registerModule(testModule);
         }
         if (schemaFactory == null) {

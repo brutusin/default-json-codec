@@ -25,17 +25,18 @@ import org.brutusin.json.ParseException;
 import org.brutusin.json.spi.JsonCodec;
 
 /**
- *
+ * 
  * @author Ignacio del Valle Alles idelvall@brutusin.org
+ * @param <T> 
  */
-public class InputStreamDeserializer extends StdDeserializer<InputStream> {
+public class InputStreamDeserializer<T extends InputStream> extends StdDeserializer<T>{
 
     public InputStreamDeserializer() {
         super(InputStream.class);
     }
 
     @Override
-    public InputStream deserialize(JsonParser jp, com.fasterxml.jackson.databind.DeserializationContext dc) throws IOException, JsonProcessingException {
+    public T deserialize(JsonParser jp, com.fasterxml.jackson.databind.DeserializationContext dc) throws IOException, JsonProcessingException {
         SerializationContext ctx = SerializationContext.getCurrentContext();
         if (ctx == null) {
             return null;
@@ -43,7 +44,7 @@ public class InputStreamDeserializer extends StdDeserializer<InputStream> {
         TreeNode tree = jp.getCodec().readTree(jp);
         if (tree != null) {
             try {
-                return (InputStream) ctx.getInputStreamAndRegisterCount(JsonCodec.getInstance().parse(tree.toString(), String.class));
+                return (T) ctx.getInputStreamAndRegisterCount(JsonCodec.getInstance().parse(tree.toString(), String.class));
             } catch (ParseException ex) {
                throw new RuntimeException(ex);
             }
