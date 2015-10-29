@@ -184,7 +184,7 @@ public class JacksonCodec extends JsonCodec {
         } catch (JsonParseException ex) {
             throw new ParseException(ex);
         } catch (JsonMappingException ex) {
-            throw new RuntimeException(ex);
+            throw new ParseException(ex);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         } finally {
