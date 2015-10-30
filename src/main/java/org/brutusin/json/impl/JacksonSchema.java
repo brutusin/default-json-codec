@@ -108,7 +108,7 @@ public class JacksonSchema extends JacksonNode implements JsonSchema {
             synchronized (this) {
                 if (validator == null) {
                     ValidationConfigurationBuilder cfgBuilder = ValidationConfiguration.newBuilder();
-                    cfgBuilder.addLibrary("http://brutusin.org/json", DraftV3Library.get());
+                    cfgBuilder.addLibrary("http://brutusin.org/json/json-schema-spec", DraftV3Library.get());
                     validator = JsonSchemaFactory.newBuilder().setValidationConfiguration(cfgBuilder.freeze()).freeze().getJsonSchema(getNode());
                 }
             }

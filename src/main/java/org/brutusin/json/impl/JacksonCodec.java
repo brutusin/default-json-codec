@@ -24,7 +24,6 @@ import com.fasterxml.jackson.core.io.JsonStringEncoder;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -94,7 +93,7 @@ public class JacksonCodec extends JsonCodec {
         if (!jsonSchema.contains("\"$schema\"")) {
             if (jsonSchema.startsWith("{\"type\":")) {
                 StringBuilder sb = new StringBuilder(jsonSchema);
-                sb.insert(1, "\"$schema\":\"http://brutusin.org/json\",");
+                sb.insert(1, "\"$schema\":\"http://brutusin.org/json/json-schema-spec\",");
                 return sb.toString();
             }
         }
