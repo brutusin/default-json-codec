@@ -26,7 +26,9 @@ import com.fasterxml.jackson.module.jsonSchema.types.NumberSchema;
 import com.fasterxml.jackson.module.jsonSchema.types.ObjectSchema;
 import com.fasterxml.jackson.module.jsonSchema.types.SimpleTypeSchema;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.brutusin.json.annotations.DependentProperty;
 import org.brutusin.json.annotations.IndexableProperty;
 import org.brutusin.json.annotations.JsonProperty;
@@ -42,6 +44,19 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
         JsonProperty jsonAnnot = beanProperty.getAnnotation(JsonProperty.class);
         IndexableProperty indexAnnot = beanProperty.getAnnotation(IndexableProperty.class);
         DependentProperty dependsAnnot = beanProperty.getAnnotation(DependentProperty.class);
+
+        if (schema instanceof StringSchema) {
+            StringSchema sschema = (StringSchema) schema;
+            try {
+                Set<String> enums = sschema.getEnums();
+                if (enums != null) {
+                    Method method = schema.getClass().getMethod("setValues", List.class);
+                    method.invoke(schema, new ArrayList(enums));
+                }
+            } catch (Exception parseException) {
+                throw new Error("Error setting enum value from enumeration for " + beanProperty.getFullName(), parseException);
+            }
+        }
 
         if (jsonAnnot == null) {
             schema.setTitle(beanProperty.getName());
@@ -72,7 +87,7 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
                     Method method = schema.getClass().getMethod("setValues", List.class);
                     method.invoke(schema, valuesValue);
                 } catch (Exception ex) {
-                    throw new Error("Error setting dynamic enum value for " + beanProperty.getFullName(), ex);
+                    throw new Error("Error setting enum value from @JsonProperty.valuesMethod() for " + beanProperty.getFullName(), ex);
                 }
             } else {
                 String values = jsonAnnot.values();
@@ -82,7 +97,7 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
                         Method method = schema.getClass().getMethod("setValues", List.class);
                         method.invoke(schema, valuesValue);
                     } catch (Exception parseException) {
-                        throw new Error("Error setting enum value for " + beanProperty.getFullName(), parseException);
+                        throw new Error("Error setting enum value from @JsonProperty.values() for " + beanProperty.getFullName(), parseException);
                     }
                 }
             }
@@ -92,7 +107,7 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
                 Method method = schema.getClass().getMethod("setIndex", IndexableProperty.IndexMode.class);
                 method.invoke(schema, indexAnnot.mode());
             } catch (Exception parseException) {
-                throw new Error("Error setting enum value for " + beanProperty.getFullName(), parseException);
+                throw new Error("Error setting index value for " + beanProperty.getFullName(), parseException);
             }
         }
         if (dependsAnnot != null) {
@@ -520,7 +535,7 @@ public class JacksonSchemaFactory extends com.fasterxml.jackson.module.jsonSchem
         };
     }
 
-     @Override
+    @Override
     public com.fasterxml.jackson.module.jsonSchema.types.StringSchema stringSchema() {
         return new StringSchema(this);
     }
