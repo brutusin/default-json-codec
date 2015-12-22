@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import org.brutusin.commons.Pair;
@@ -213,9 +214,9 @@ public class JacksonCodec extends JsonCodec {
     }
 
     @Override
-    public String getSchemaString(Class clazz) {
+    public String getSchemaString(Type type) {
         try {
-            mapper.acceptJsonFormatVisitor(mapper.constructType(clazz), schemaFactory);
+            mapper.acceptJsonFormatVisitor(mapper.constructType(type), schemaFactory);
             com.fasterxml.jackson.module.jsonSchema.JsonSchema finalSchema = schemaFactory.finalSchema();
             return addVersion(mapper.writeValueAsString(finalSchema));
         } catch (JsonProcessingException ex) {
