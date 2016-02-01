@@ -15,6 +15,8 @@
  */
 package org.brutusin.json.impl;
 
+import java.util.Map;
+import org.brutusin.commons.Bean;
 import static org.junit.Assert.*;
 import org.brutusin.json.spi.JsonCodec;
 import org.brutusin.json.spi.JsonNode;
@@ -35,6 +37,45 @@ public class JacksonSchemaTest extends SchemaCodecTest {
         JsonNode node = JsonCodec.getInstance().parse("\"a\"");
         schema.validate(node);
         assertEquals(Thread.getAllStackTraces().keySet().size(), initialThreadNumber);
+    }
+
+    @Test
+    public void testIssue2() throws Throwable {
+        int numThreads = 1000;
+        Thread[] ts = new Thread[numThreads];
+        final Bean<Throwable> thBean = new Bean<Throwable>();
+        for (int i = 0; i < 100; i++) {
+            ts[i] = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        JsonCodec.getInstance().getSchema(TestClass.class);
+                    } catch (Throwable th) {
+                        thBean.setValue(th);
+                    }
+                }
+            };
+            ts[i].start();
+        }
+        for (int i = 0; i < 100; i++) {
+            ts[i].join();
+        }
+        if (thBean.getValue() != null) {
+            throw thBean.getValue();
+        }
+    }
+
+    public static class TestClass {
+
+        private Map<String, String> properties;
+
+        public Map<String, String> getProperties() {
+            return properties;
+        }
+
+        public void setProperties(Map<String, String> properties) {
+            this.properties = properties;
+        }
     }
 
 }
