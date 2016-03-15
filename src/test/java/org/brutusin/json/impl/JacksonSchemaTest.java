@@ -64,6 +64,11 @@ public class JacksonSchemaTest extends SchemaCodecTest {
             throw thBean.getValue();
         }
     }
+    
+    @Test
+    public void testIssue3() throws Throwable {
+        System.out.println( JsonCodec.getInstance().getSchema(MyEnum.class));
+    }
 
     public static class TestClass {
 

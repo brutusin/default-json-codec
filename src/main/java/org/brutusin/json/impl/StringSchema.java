@@ -3,7 +3,9 @@ package org.brutusin.json.impl;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonValueFormat;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.brutusin.json.annotations.IndexableProperty;
 
 /**
@@ -54,6 +56,14 @@ public class StringSchema extends com.fasterxml.jackson.module.jsonSchema.types.
         this.values = values;
     }
 
+    @Override
+    public void setEnums(Set<String> enums) {
+        super.setEnums(enums);
+        if (values == null) {
+            setValues(new ArrayList(enums));
+        }
+    }
+
     public IndexableProperty.IndexMode getIndex() {
         return index;
     }
@@ -76,7 +86,7 @@ public class StringSchema extends com.fasterxml.jackson.module.jsonSchema.types.
     public String getId() {
         return super.getId();
     }
-    
+
     @JsonIgnore
     @Override
     public JsonValueFormat getFormat() {
