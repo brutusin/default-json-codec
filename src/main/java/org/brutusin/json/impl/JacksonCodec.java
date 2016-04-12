@@ -52,6 +52,7 @@ public class JacksonCodec extends JsonCodec {
     static {
         DEFAULT_FORMAT_MAP.put(File.class, "file");
         DEFAULT_FORMAT_MAP.put(InputStream.class, "inputstream");
+        DEFAULT_FORMAT_MAP.put(MetaDataInputStream.class, "inputstream");
     }
 
     private final ObjectMapper mapper;
@@ -157,6 +158,15 @@ public class JacksonCodec extends JsonCodec {
     }
 
     @Override
+    public Map<String, InputStream> getStreams(JsonNode node) {
+        if (node instanceof JacksonNode) {
+            JacksonNode jacksonNode = (JacksonNode) node;
+            return jacksonNode.getStreams();
+        }
+        return null;
+    }
+
+    @Override
     public <T> T parse(String json, Class<T> clazz) throws ParseException {
         if (json == null || json.trim().isEmpty()) {
             return null;
@@ -172,7 +182,6 @@ public class JacksonCodec extends JsonCodec {
         }
     }
 
-    @Override
     public <T> Pair<T, Integer> parse(String json, Class<T> clazz, Map<String, InputStream> streams) throws ParseException {
         if (json == null || json.trim().isEmpty()) {
             return null;
@@ -194,6 +203,9 @@ public class JacksonCodec extends JsonCodec {
 
     @Override
     public <T> T load(JsonNode node, Class<T> clazz) {
+        if (JsonNode.class.equals(clazz)) {
+            return (T) node;
+        }
         try {
             Map<String, InputStream> streams;
             if (node instanceof JacksonNode) {

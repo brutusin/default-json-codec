@@ -40,7 +40,7 @@ public class JsonNodeDeserializer extends StdDeserializer<JsonNode> {
     public JsonNode deserialize(JsonParser jp, DeserializationContext dc) throws IOException, JsonProcessingException {
         try {
             TreeNode tree = jp.getCodec().readTree(jp);
-            return JsonCodec.getInstance().parse(tree.toString());
+            return JsonCodec.getInstance().parse(tree.toString(), SerializationContext.getCurrentContext() != null ? SerializationContext.getCurrentContext().getMap() : null);
         } catch (ParseException ex) {
             throw new JsonParseException(ex.getMessage(), null);
         }

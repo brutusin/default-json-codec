@@ -16,7 +16,6 @@
 package org.brutusin.json.impl;
 
 import com.fasterxml.jackson.databind.node.JsonNodeType;
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Map;
@@ -91,14 +90,10 @@ public class JacksonNode implements JsonNode {
         }
         String str = asString();
         if (streams == null) {
-            return new ByteArrayInputStream(str.getBytes());
+            return null;
         }
         InputStream stream = streams.get(str);
-        if (stream == null) {
-            return new ByteArrayInputStream(str.getBytes());
-        } else {
-            return stream;
-        }
+        return stream;
     }
 
     @Override
