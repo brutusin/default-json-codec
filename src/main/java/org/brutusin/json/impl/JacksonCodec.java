@@ -17,13 +17,16 @@ package org.brutusin.json.impl;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.core.io.JsonStringEncoder;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -117,6 +120,14 @@ public class JacksonCodec extends JsonCodec {
     @Override
     public void registerStringFormat(Class clazz, String format) {
         this.schemaFactory.registerStringFormat(clazz, format);
+        SimpleModule testModule = new SimpleModule("json-provider-module:" + format, new Version(1, 0, 0, null, "org.brutusin", "json-provider:" + format));
+        testModule.addSerializer(new StdSerializer(clazz) {
+            @Override
+            public void serialize(Object value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+                gen.writeString(value.toString());
+            }
+        });
+        mapper.registerModule(testModule);
     }
 
     @Override
@@ -261,6 +272,13 @@ public class JacksonCodec extends JsonCodec {
             throw new ParseException(ex);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
+        }
+    }
+
+    public static class A extends File {
+
+        public A(String pathname) {
+            super(pathname);
         }
     }
 }
