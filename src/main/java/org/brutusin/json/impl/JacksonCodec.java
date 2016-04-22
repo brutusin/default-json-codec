@@ -22,11 +22,13 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.core.io.JsonStringEncoder;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -178,6 +180,23 @@ public class JacksonCodec extends JsonCodec {
     }
 
     @Override
+    public Object parse(String json, Type type) throws ParseException {
+        if (json == null || json.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            JavaType jt = TypeFactory.defaultInstance().constructType(type);
+            return mapper.readValue(json, jt);
+        } catch (JsonParseException ex) {
+            throw new ParseException(ex);
+        } catch (JsonMappingException ex) {
+            throw new RuntimeException(ex);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    @Override
     public <T> T parse(String json, Class<T> clazz) throws ParseException {
         if (json == null || json.trim().isEmpty()) {
             return null;
@@ -190,6 +209,26 @@ public class JacksonCodec extends JsonCodec {
             throw new RuntimeException(ex);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
+        }
+    }
+    
+    public Pair<Object, Integer> parse(String json, Type type, Map<String, InputStream> streams) throws ParseException {
+        if (json == null || json.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            SerializationContext sc = new SerializationContext(streams);
+            SerializationContext.setCurrentContext(sc);
+            JavaType jt = TypeFactory.defaultInstance().constructType(type);
+            return new Pair<Object, Integer>(mapper.readValue(json, jt), sc.getDeclaredStreams());
+        } catch (JsonParseException ex) {
+            throw new ParseException(ex);
+        } catch (JsonMappingException ex) {
+            throw new ParseException(ex);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        } finally {
+            SerializationContext.closeCurrentContext();
         }
     }
 
@@ -226,6 +265,25 @@ public class JacksonCodec extends JsonCodec {
                 streams = null;
             }
             return parse(node.toString(), clazz, streams).getElement1();
+        } catch (ParseException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    @Override
+    public Object load(JsonNode node, Type type) {
+        if (JsonNode.class.equals(type)) {
+            return node;
+        }
+        try {
+            Map<String, InputStream> streams;
+            if (node instanceof JacksonNode) {
+                JacksonNode jn = (JacksonNode) node;
+                streams = jn.getStreams();
+            } else {
+                streams = null;
+            }
+            return parse(node.toString(), type, streams).getElement1();
         } catch (ParseException ex) {
             throw new RuntimeException(ex);
         }
