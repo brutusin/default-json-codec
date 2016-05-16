@@ -211,7 +211,7 @@ public class JacksonCodec extends JsonCodec {
             throw new RuntimeException(ex);
         }
     }
-    
+
     public Pair<Object, Integer> parse(String json, Type type, Map<String, InputStream> streams) throws ParseException {
         if (json == null || json.trim().isEmpty()) {
             return null;
@@ -253,6 +253,9 @@ public class JacksonCodec extends JsonCodec {
 
     @Override
     public <T> T load(JsonNode node, Class<T> clazz) {
+        if (node == null) {
+            return null;
+        }
         if (JsonNode.class.equals(clazz)) {
             return (T) node;
         }
@@ -272,6 +275,9 @@ public class JacksonCodec extends JsonCodec {
 
     @Override
     public Object load(JsonNode node, Type type) {
+        if (node == null) {
+            return null;
+        }
         if (JsonNode.class.equals(type)) {
             return node;
         }
