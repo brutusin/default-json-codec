@@ -9,7 +9,7 @@
     <groupId>org.brutusin</groupId>
     <artifactId>json-provider</artifactId>
     <packaging>jar</packaging>   
-    <version>2.5.3</version>
+    <version>2.5.4-SNAPSHOT</version>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Service provider for JsonCodec SPI, based on Jackson-stack</description>
     <url>https://github.com/brutusin/json-provider</url>
@@ -28,7 +28,7 @@
         <url>https://github.com/brutusin/json-provider</url>
         <connection>scm:git:https://github.com/brutusin/json-provider.git</connection>
         <developerConnection>scm:git:https://github.com/brutusin/json-provider.git</developerConnection>
-        <tag>v2.5.3</tag>
+        <tag>HEAD</tag>
     </scm>
     
     <properties>
