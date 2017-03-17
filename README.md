@@ -1,4 +1,4 @@
-#org.brutusin:json-provider [![Build Status](https://api.travis-ci.org/brutusin/json-provider.svg?branch=master)](https://travis-ci.org/brutusin/json-provider) [![Maven Central Latest Version](https://maven-badges.herokuapp.com/maven-central/org.brutusin/json-provider/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.brutusin/json-provider/)
+# org.brutusin:json-provider [![Build Status](https://api.travis-ci.org/brutusin/json-provider.svg?branch=master)](https://travis-ci.org/brutusin/json-provider) [![Maven Central Latest Version](https://maven-badges.herokuapp.com/maven-central/org.brutusin/json-provider/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.brutusin/json-provider/)
 Service provider for [org.brutusin:json SPI](https://github.com/brutusin/json), based on Jackson-stack:
 
 * [FasterXML/jackson stack](https://github.com/FasterXML/jackson): The underlying JSON stack.
@@ -14,5 +14,5 @@ https://github.com/brutusin/json-provider/issues
 
 Contributions are always welcome and greatly appreciated!
 
-##License
+## License
 Apache License, Version 2.0
